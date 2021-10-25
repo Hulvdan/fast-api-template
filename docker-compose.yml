@@ -1,0 +1,69 @@
+---
+# Default compose file for development and production.
+# Should be used directly in development.
+# Automatically loads `docker-compose.override.yml` if it exists.
+# No extra steps required.
+# Should be used together with `docker/docker-compose.prod.yml`
+# in production.
+
+version: "3.8"
+services:
+  s3storage:
+    image: "minio/minio"
+    restart: unless-stopped
+#    volumes:
+#      - backend_pgdata:/var/lib/postgresql/data
+    networks:
+      - webnet
+    env_file: backend/.env
+
+  backend_db:
+    image: "postgres:13-alpine"
+    restart: unless-stopped
+    volumes:
+      - backend_pgdata:/var/lib/postgresql/data
+    networks:
+      - webnet
+    env_file: backend/.env
+
+  backend:
+    <<: &backend # Image name is changed in production:
+      image: "backend:dev"
+      build:
+        target: development_build
+        context: backend
+        dockerfile: ./docker/Dockerfile
+        args:
+          ENVIRONMENT: development
+        cache_from:
+          - "backend:dev"
+          - "backend:latest"
+          - "*"
+
+      depends_on:
+        - backend_db
+      networks:
+        - webnet
+      env_file: backend/.env
+
+    command: sh scripts/runserver.sh
+    # healthcheck:
+    #   # We use `$$` here because:
+    #   # one `$` goes to shell,
+    #   # one `$` goes to `docker-compose.yml` escaping
+    #   test: |
+    #     /usr/bin/test $$(
+    #       /usr/bin/curl --fail http://localhost:8000/api/v1/health-check/?format=json
+    #       --write-out "%{http_code}" --silent --output /dev/null
+    #     ) -eq 200
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 30s
+
+networks:
+  # Network for your internals, use it by default:
+  webnet:
+
+volumes:
+  backend_pgdata:
