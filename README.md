@@ -1,3 +1,19 @@
-# fastapi-template
+# fast-api-template
 
-## Что это?
+Здесь собраны лучшие практики ведения проекта
+
+## Contributing to the project
+
+### pre-commit
+
+Необходимо глобально установить pre-commit
+
+```shell
+pip install pre-commit
+```
+
+В папке проекта выполните следующую команду, чтобы производились проверки перед каждым коммитом:
+
+```shell
+pre-commit install --install-hooks
+```

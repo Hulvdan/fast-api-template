@@ -1,0 +1,31 @@
+# https://pre-commit.com/
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: debug-statements
+      - id: mixed-line-ending
+      - id: check-ast
+
+  - repo: local
+    hooks:
+      - id: backend-black
+        name: backend-black
+        entry: backend/.venv/bin/black --config backend/pyproject.toml
+        language: system
+        files: ^backend/.*.(py|pyi)$
+
+      - id: backend-isort
+        name: backend-isort
+        entry: backend/.venv/bin/isort --sp backend/pyproject.toml
+        language: system
+        files: ^backend/.*.(py|pyi)$
+
+      - id: backend-mypy
+        name: backend-mypy
+        entry: backend/.venv/bin/mypy --config-file backend/setup.cfg backend
+        language: system
+        files: ^backend/.*.(py|pyi)$
+        pass_filenames: false
