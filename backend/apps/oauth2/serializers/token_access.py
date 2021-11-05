@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import Form
 from pydantic import BaseModel
 
@@ -17,5 +19,5 @@ class TokenAccess:
 
 
 class TokenOut(BaseModel):
-    access_token: str
+    access_token: UUID
     token_type: str

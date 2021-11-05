@@ -8,14 +8,14 @@
 
 version: "3.8"
 services:
-  s3storage:
-    image: "minio/minio"
-    restart: unless-stopped
-#    volumes:
-#      - backend_pgdata:/var/lib/postgresql/data
-    networks:
-      - webnet
-    env_file: backend/.env
+#  s3storage:
+#    image: "minio/minio"
+#    restart: unless-stopped
+##    volumes:
+##      - backend_pgdata:/var/lib/postgresql/data
+#    networks:
+#      - webnet
+#    env_file: backend/.env
 
   backend_db:
     image: "postgres:13-alpine"

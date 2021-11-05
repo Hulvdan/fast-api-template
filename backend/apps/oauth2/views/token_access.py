@@ -1,42 +1,57 @@
-#  -*- coding: utf-8 -*-
-
+from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, HTTPException
 from fastapi.routing import APIRouter
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import raiseload, subqueryload
 from starlette import status
 
-from apps.oauth2.depends.app import get_app_object_access
-from apps.oauth2.models.access_token import AccessToken
-from apps.oauth2.models.apps import App
-from apps.oauth2.serializers.token_access import TokenAccess, TokenOut
-from core.config import SCOPES
-from core.depends import get_database
+from core.containers import Container
+from core.resources.database import DatabaseResource
+from core.utils.get_object_or_404 import get_object_or_404
+
+from ..models.access_token import AccessToken
+from ..models.apps import App
+from ..serializers.token_access import TokenAccess, TokenOut
 
 router = APIRouter()
 
 
 @router.post("/token", response_model=TokenOut)
+@inject
 async def login_for_access_token(
-    app: App = Depends(get_app_object_access),
-    session: Session = Depends(get_database),
     access: TokenAccess = Depends(),
+    db: DatabaseResource = Depends(Provide[Container.resources.db]),
+    auth_config=Depends(Provide[Container.config.auth]),
 ):
-    scopes = access.scopes
+    async with db.session() as session:
+        statement = (
+            select(App)
+            .filter(App.client_secret == access.client_secret, App.client_id == access.client_id)
+            .options(subqueryload(App.access_tokens), raiseload("*"))
+        )
+        app = get_object_or_404(await session.execute(statement))
+        scopes = access.scopes
 
-    if len(scopes) == 0:
-        scopes = [list(SCOPES.keys())[0]]
+        if len(scopes) == 0:
+            scopes = [list(auth_config.oauth_scopes.keys())[0]]
 
-    allowed_scopes = SCOPES.keys()
+        allowed_scopes = auth_config.oauth_scopes.keys()
 
-    for scope in scopes:
-        if scope not in allowed_scopes:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail={"scope": f"{scope} scope is not in allowed scopes"},
-            )
+        for scope in scopes:
+            if scope not in allowed_scopes:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail={"scope": f"{scope} scope is not in allowed scopes"},
+                )
 
-    access_token = AccessToken(scopes=scopes)
-    app.access_tokens.append(access_token)
-    session.commit()
+        access_token = AccessToken(scopes=scopes)
+        session.add(access_token)
+        await session.commit()
+        await session.refresh(access_token)
+        await session.refresh(app)
+        app.access_tokens.append(access_token)
+        await session.commit()
+        await session.refresh(access_token)
 
     return {"access_token": access_token.access_token, "token_type": "bearer"}

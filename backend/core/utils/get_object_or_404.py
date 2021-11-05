@@ -5,7 +5,7 @@ from starlette import status
 
 def get_object_or_404(qs):
     try:
-        return qs.one()
+        return qs.scalar_one()
     except MultipleResultsFound:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     except NoResultFound:
@@ -14,7 +14,7 @@ def get_object_or_404(qs):
 
 def get_object(qs):
     try:
-        return qs.one()
+        return qs.scalar_one()
     except MultipleResultsFound:
         return None
     except NoResultFound:

@@ -23,9 +23,9 @@ repos:
         language: system
         files: ^backend/.*.(py|pyi)$
 
-      - id: backend-mypy
-        name: backend-mypy
-        entry: backend/.venv/bin/mypy --config-file backend/setup.cfg backend
-        language: system
-        files: ^backend/.*.(py|pyi)$
-        pass_filenames: false
+#      - id: backend-mypy
+#        name: backend-mypy
+#        entry: backend/.venv/bin/mypy --config-file backend/setup.cfg backend
+#        language: system
+#        files: ^backend/.*.(py|pyi)$
+#        pass_filenames: false

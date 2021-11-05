@@ -3,9 +3,6 @@
 
 FROM python:3.9.7-slim-buster AS development_build
 
-LABEL maintainer="sobolevn@wemake.services"
-LABEL vendor="wemake.services"
-
 ARG ENVIRONMENT
 
 ENV ENVIRONMENT=${ENVIRONMENT} \

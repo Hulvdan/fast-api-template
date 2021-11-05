@@ -21,8 +21,6 @@ echo >&2 'Postgres is up - continuing...'
 
 # Applying migrations
 echo >&2 'Applying migrations...'
-echo $(pwd)
-echo $(ls -lA)
 sh scripts/migrate.sh head
 
 # Evaluating passed command (do not touch):

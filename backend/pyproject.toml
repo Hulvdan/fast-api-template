@@ -16,6 +16,17 @@ multi_line_output = 3
 line_length = 100
 include_trailing_comma = true
 
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+filterwarnings = [
+  "ignore::DeprecationWarning",
+  "ignore::UserWarning"
+]
+
 [tool.poetry.dependencies]
 python = "^3.9"
 
@@ -24,16 +35,18 @@ uvicorn = "^0.15.0"
 uvloop = "^0.16.0"
 
 # DB
-alembic = "^1.7.4"
-psycopg2-binary = "^2.9.1"
-SQLAlchemy = "^1.4.26"
+SQLAlchemy = {version = ">=1.4,<2", extras = ["asyncio"]}
 SQLAlchemy-Utils = "^0.37.9"
+alembic = "^1.7.4"
+asyncpg = "^0.24.0"
+psycopg2-binary = "^2.9.1"
 
 # Framework
 fastapi = "^0.70.0"
 pydantic = "^1.8.2"
 
 # Utils
+Pillow = "^8.4.0"
 PyJWT = "^2.3.0"
 aioboto3 = "^9.2.2"
 aiohttp = "^3.7.4"
@@ -50,7 +63,9 @@ mypy-extensions = "^0.4.3"
 
 # Tests
 factory-boy = "^3.2.0"
+httpx = "^0.20.0"
 pytest = "^6.2.5"
+pytest-asyncio = "^0.16.0"
 pytest-xdist = "^2.4.0"
 
 [tool.poetry.dev-dependencies]
@@ -58,8 +73,5 @@ pytest-xdist = "^2.4.0"
 black = "^21.9b0"
 isort = "^5.9.3"
 
-# Refactoring
-rope = "^0.21.0"
-
+sqlalchemy2-stubs = "^0.0.2-alpha.19"
 # Stubs
-sqlalchemy-stubs = "^0.4"

@@ -10,15 +10,13 @@ from alembic import context
 BASE_DIR = Path(__file__).parent.parent.absolute()
 os.sys.path.append(str(BASE_DIR))
 
+from core.containers.config import AppConfig, DatabaseConfig
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-from core.utils.init_config import init_config
-from core.utils.init_db import get_dsn
-
 config = context.config
-config_app = init_config()
-dsn = get_dsn(config_app)
-
+dsn = DatabaseConfig().database_url.replace("+asyncpg", "")
+print(dsn)
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
@@ -31,11 +29,10 @@ config.set_main_option("sqlalchemy.url", dsn)
 # target_metadata = mymodel.Base.metadata
 
 target_metadata = []
-for app in config_app.APPS:
+for app in AppConfig.apps:
     try:
         i = importlib.import_module("apps.{}.models".format(app))
     except ModuleNotFoundError:
-        print("No models found for '{}' app".format(app))
         continue
 
     if len(target_metadata) > 0:

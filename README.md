@@ -17,3 +17,14 @@ pip install pre-commit
 ```shell
 pre-commit install --install-hooks
 ```
+
+### poetry
+
+```shell
+poetry config virtualenvs.in-project true
+```
+
+```shell
+cd backend
+poetry install
+```
