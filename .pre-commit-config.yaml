@@ -13,19 +13,19 @@ repos:
     hooks:
       - id: backend-black
         name: backend-black
-        entry: backend/.venv/bin/black --config backend/pyproject.toml
+        entry: backend/.venv/bin/black --config backend/pyproject.toml --check
         language: system
         files: ^backend/.*.(py|pyi)$
 
       - id: backend-isort
         name: backend-isort
-        entry: backend/.venv/bin/isort --sp backend/pyproject.toml
+        entry: backend/.venv/bin/isort --sp backend/pyproject.toml --check-only
         language: system
         files: ^backend/.*.(py|pyi)$
 
-#      - id: backend-mypy
-#        name: backend-mypy
-#        entry: backend/.venv/bin/mypy --config-file backend/setup.cfg backend
-#        language: system
-#        files: ^backend/.*.(py|pyi)$
-#        pass_filenames: false
+      - id: backend-mypy
+        name: backend-mypy
+        entry: backend/.venv/bin/mypy --config-file backend/setup.cfg backend
+        language: system
+        files: ^backend/.*.(py|pyi)$
+        pass_filenames: false
