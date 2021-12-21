@@ -1,5 +1,5 @@
 import importlib
-import os
+import sys
 from logging.config import fileConfig
 from pathlib import Path
 
@@ -8,9 +8,9 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 
 BASE_DIR = Path(__file__).parent.parent.absolute()
-os.sys.path.append(str(BASE_DIR))
+sys.path.append(str(BASE_DIR))
 
-from core.containers.config import AppConfig, DatabaseConfig
+from core.config import AppConfig, DatabaseConfig
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -6,7 +6,7 @@ def get_remote_host(
     host: str = Header(None),
     x_real_ip: str = Header(None, alias="X-Real-IP"),
     scheme: str = Header("http"),
-):
+) -> str:
     template_host = "{}://{}"
     if x_real_ip:
         return template_host.format(scheme, x_real_ip)

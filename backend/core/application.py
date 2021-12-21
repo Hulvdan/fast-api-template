@@ -1,20 +1,15 @@
-import sys
-
-from dependency_injector.wiring import Provide, inject
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
-from core.containers.config import AppConfig
+from core.resources.database import DatabaseResource
 
-from .containers import Container
+from .config import AppConfig
+from .container import initialize_container
 
 
-@inject
-def add_cors_middleware(
-    app: FastAPI, app_config: AppConfig = Provide[Container.config.app]
-) -> None:
+def add_cors_middleware(app: FastAPI, app_config: AppConfig) -> None:
     origins = []
 
     if app_config.cors_origins:
@@ -32,24 +27,15 @@ def add_cors_middleware(
 
 
 async def create_app() -> FastAPI:
-    container = Container()
     from . import urls
 
-    container.wire(
-        modules=[
-            sys.modules[__name__],
-        ],
-        packages=[
-            sys.modules["apps"],
-        ],
-    )
+    container = initialize_container()
 
-    db = container.resources.db()
-    await db.create_database()
+    db = container.resolve(DatabaseResource)
 
-    app = FastAPI(title=container.config.app.provided.project_name())
+    app = FastAPI(title=container.resolve(AppConfig).project_name)
     app.include_router(urls.router)
-    add_cors_middleware(app)
+    add_cors_middleware(app, container.resolve(AppConfig))
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(_: Request, exc: Exception) -> PlainTextResponse:

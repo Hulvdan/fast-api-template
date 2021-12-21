@@ -1,6 +1,6 @@
 import logging
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
-from typing import Callable, cast
+from typing import AsyncGenerator, Callable, Generator, cast
 
 from sqlalchemy import create_engine, orm
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -8,22 +8,24 @@ from sqlalchemy_utils import create_database, database_exists
 
 from core.db import Base
 
+from ..config import DatabaseConfig
+
 logger = logging.getLogger(__name__)
 
 
 class DatabaseResource:
-    def __init__(self, database_config) -> None:
+    def __init__(self, database_config: DatabaseConfig) -> None:
         self._database_name = database_config.database
         self._database_url = database_config.database_url
         self._engine = create_async_engine(self._database_url)
         self._session_factory = orm.scoped_session(
-            orm.sessionmaker(
+            orm.sessionmaker(  # type: ignore
                 autocommit=False, autoflush=False, bind=self._engine, class_=AsyncSession
             )
         )
 
     @property
-    def _sync_db_url(self):
+    def _sync_db_url(self) -> str:
         return self._database_url.replace("+asyncpg", "")
 
     async def create_database(self) -> None:
@@ -34,7 +36,7 @@ class DatabaseResource:
     async def create_tables(self) -> None:
         database_url = self._sync_db_url
         engine = create_engine(database_url)
-        Base.metadata.create_all(engine)
+        Base.metadata.create_all(engine)  # type: ignore
         engine.dispose()
 
     async def clear_tables(self) -> None:
@@ -44,12 +46,11 @@ class DatabaseResource:
         pass
 
     @asynccontextmanager
-    async def session(self) -> Callable[..., AbstractAsyncContextManager[AsyncSession]]:
+    async def session(self) -> AsyncGenerator[AsyncSession, None]:
         session = cast(AsyncSession, self._session_factory())
         try:
             yield session
         except Exception as err:
-            logger.exception("Session rollback because of exception. ")
             await session.rollback()
             raise err
         finally:
