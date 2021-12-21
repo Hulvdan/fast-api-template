@@ -30,21 +30,27 @@ def container() -> Container:
     return container
 
 
+@fixture(scope="session", autouse=True)
+def db(container) -> None:
+    """Инициализация БД для тестов.
+
+    Создание БД при старте тестов и удаление при завершении.
+    """
+    db: DatabaseResource = container.resolve(DatabaseResource)
+    db.drop_database()
+    db.create_database()
+    yield
+    db.drop_database()
+
+
 @fixture(scope="session")
-def auth_config(container) -> AuthConfig:
+def auth_config(container: Container) -> AuthConfig:
     return container.resolve(AuthConfig)
 
 
 @fixture(scope="session")
 def event_loop() -> asyncio.AbstractEventLoop:
     return asyncio.get_event_loop()
-
-
-@fixture(scope="function")
-async def session(container: Container) -> AsyncSession:
-    db = container.resolve(DatabaseResource)
-    async with db.session() as session:
-        yield session
 
 
 @fixture(scope="function")

@@ -12,7 +12,6 @@ class AppConfig(BaseSettings):
     base_dir = BASE_DIR
     apps: list[str] = [
         "health_check",
-        "token",
         "hello_world",
     ]
 
