@@ -29,7 +29,7 @@ config.set_main_option("sqlalchemy.url", dsn)
 # target_metadata = mymodel.Base.metadata
 
 target_metadata = []
-for app in AppConfig.apps:
+for app in AppConfig().apps:
     try:
         i = importlib.import_module("apps.{}.models".format(app))
     except ModuleNotFoundError:
