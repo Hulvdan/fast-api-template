@@ -13,6 +13,4 @@ def initialize_container() -> punq.Container:
 
     container.register(DatabaseResource, factory=DatabaseResource)
 
-    container.finalize()
-
     return container

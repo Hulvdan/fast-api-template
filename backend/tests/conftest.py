@@ -9,25 +9,41 @@ from PIL import Image
 from pytest import fixture
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.config import AuthConfig
+from core.resources.database import DatabaseResource
+from libs.punq import Container
+
 logger = logging.getLogger("fixture")
 logger.setLevel(logging.INFO)
 
 
 def pytest_sessionstart():
-    os.environ.setdefault("POSTGRES_DB", "backendtest")
-    from core.containers import Container
+    os.environ["POSTGRES_DB"] = "postgres_test"
 
 
 @fixture(scope="session")
-def event_loop():
+def container() -> Container:
+    from core.container import initialize_container
+
+    container = initialize_container()
+    container.finalize()
+    return container
+
+
+@fixture(scope="session")
+def auth_config(container) -> AuthConfig:
+    return container.resolve(AuthConfig)
+
+
+@fixture(scope="session")
+def event_loop() -> asyncio.AbstractEventLoop:
     return asyncio.get_event_loop()
 
 
 @fixture(scope="function")
-async def session() -> AsyncSession:
-    from core.containers import Container
-
-    async with Container.resources.db().session() as session:
+async def session(container: Container) -> AsyncSession:
+    db = container.resolve(DatabaseResource)
+    async with db.session() as session:
         yield session
 
 

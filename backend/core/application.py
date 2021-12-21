@@ -30,6 +30,7 @@ async def create_app() -> FastAPI:
     from . import urls
 
     container = initialize_container()
+    container.finalize()
 
     db = container.resolve(DatabaseResource)
 
