@@ -1,0 +1,587 @@
+"""
+Punq is a dependency injection library you can understand.
+
+https://github.com/Hulvdan/punq forked from https://github.com/bobthemighty/punq
+"""
+
+import inspect
+from collections import defaultdict
+from enum import Enum
+from typing import Any, Callable, List, NamedTuple, Type, TypeVar, Union, get_type_hints, overload
+
+from pkg_resources import DistributionNotFound, get_distribution
+
+from ._compat import ensure_forward_ref, is_generic_list
+
+try:  # pragma no cover
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:  # pragma no cover
+    # package is not installed
+    pass
+
+
+T = TypeVar("T")
+
+
+class FinalizedException(Exception):
+    """
+    Raised when `finalize` method of container was called
+    and later tried to register smth.
+
+    Examples:
+        >>> from punq import Container
+        ... class IClient:
+        ...     pass
+        ... class Client(IClient):
+        ...     pass
+        ... class IConsumer:
+        ...     pass
+        ... class Consumer(Consumer):
+        ...     pass
+        >>> container = Container()
+        >>> container.register(IClient, Client)
+        >>> container.finalize()
+        >>> container.register(IConsumer, Consumer)
+    """
+
+
+class ReassignmentsProhibitedException(Exception):
+    """
+    Raised when registering multiple implementations of the same abstract
+    service again if `reassignments_prohibited` is set to `True`.
+
+    Examples:
+        >>> from punq import Container
+        ... class IClient:
+        ...     pass
+        ... class FirstClient(IClient):
+        ...     pass
+        ... class SecondClient(IClient):
+        ...     pass
+        >>> container = Container()
+        >>> container.register(IClient, FirstClient)
+        >>> container.register(IClient, SecondClient)
+    """
+
+
+class MissingDependencyException(Exception):
+    """
+    Raised when a service, or one of its dependencies, is not registered.
+
+    Examples:
+        >>> import punq
+        >>> container = punq.Container()
+        >>> container.resolve("foo")
+        Traceback (most recent call last):
+        punq.MissingDependencyException: Failed to resolve implementation for foo
+    """
+
+    pass
+
+
+class InvalidRegistrationException(Exception):
+    """
+    Raised when a registration would result in an unresolvable service.
+    """
+
+    pass
+
+
+class InvalidForwardReferenceException(Exception):
+    """
+    Raised when a registered service has a forward reference that can't be
+    resolved.
+
+    Examples:
+        In this example, we register a service with a string as a type annotation.
+        When we try to inspect the constructor for the service we fail with an
+        InvalidForwardReferenceException
+
+        >>> from attr import dataclass
+        >>> from punq import Container
+        >>> @dataclass
+        ... class Client:
+        ...     dep: 'Dependency'
+        >>> container = Container()
+        >>> container.register(Client)
+        Traceback (most recent call last):
+        ...
+        punq.InvalidForwardReferenceException: name 'Dependency' is not defined
+
+
+        This error can be resolved by first registering a type with the name
+        'Dependency' in the container.
+
+        >>> class Dependency:
+        ...     pass
+        ...
+        >>> container.register(Dependency)
+        <punq.Container object at 0x...>
+        >>> container.register(Client)
+        <punq.Container object at 0x...>
+        >>> container.resolve(Client)
+        Client(dep=<punq.Dependency object at 0x...>)
+
+
+        Alternatively, we can register a type using the literal key 'Dependency'.
+
+        >>> class AlternativeDependency:
+        ...     pass
+        ...
+        >>> container = Container()
+        >>> container.register('Dependency', AlternativeDependency)
+        <punq.Container object at 0x...>
+        >>> container.register(Client)
+        <punq.Container object at 0x...>
+        >>> container.resolve(Client)
+        Client(dep=<punq.AlternativeDependency object at 0x...>)
+
+    """
+
+    pass
+
+
+class Scope(Enum):
+    transient = 0
+    singleton = 1
+
+
+class Registration(NamedTuple):
+    service: str
+    scope: Scope
+    builder: Callable[[], Any]
+    needs: Any
+    args: List[Any]
+
+
+class Empty:
+    pass
+
+
+empty = Empty()
+
+
+def match_defaults(args, defaults):
+    """
+    Matches args with their defaults in the result of getfullargspec
+
+    inspect.getfullargspec returns a complex object that includes the defaults
+    on args and kwonly args. This function takes a list of args, and a tuple of
+    the last N defaults and returns a dict of args to defaults.
+    """
+
+    if defaults is None:
+        return dict()
+
+    offset = len(args) - len(defaults)
+    defaults = ([None] * offset) + list(defaults)
+
+    return {key: value for key, value in zip(args, defaults) if value is not None}
+
+
+class Registry:
+    def __init__(self, reassignments_prohibited: bool):
+        self.__registrations = defaultdict(list)
+        self._localns = dict()
+        self._reassignments_prohibited = reassignments_prohibited
+
+    def _get_needs_for_ctor(self, cls):
+        try:
+            return get_type_hints(cls.__init__, None, self._localns)
+        except NameError as e:
+            raise InvalidForwardReferenceException(str(e))
+
+    def register_service_and_impl(self, service, scope, impl, resolve_args):
+        """Registers a concrete implementation of an abstract service.
+
+        Examples:
+             In this example, the EmailSender type is an abstract class
+             and SmtpEmailSender is our concrete implementation.
+
+             >>> from punq import Container
+             >>> container = Container()
+
+             >>> class EmailSender:
+             ...     def send(self, msg):
+             ...         pass
+             ...
+             >>> class SmtpEmailSender(EmailSender):
+             ...     def send(self, msg):
+             ...         print("Sending message via smtp: " + msg)
+             ...
+             >>> container.register(EmailSender, SmtpEmailSender)
+             <punq.Container object at 0x...>
+             >>> instance = container.resolve(EmailSender)
+             >>> instance.send("Hello")
+             Sending message via smtp: Hello
+        """
+        if self._reassignments_prohibited:
+            if len(self.__registrations[service]) > 0:
+                raise ReassignmentsProhibitedException
+        self.__registrations[service].append(
+            Registration(service, scope, impl, self._get_needs_for_ctor(impl), resolve_args)
+        )
+
+    def register_service_and_instance(self, service, instance):
+        """Register a singleton instance to implement a service.
+
+        Examples:
+            If we have an object that is expensive to construct, or that
+            wraps a resource that must not be shared, we might choose to
+            use a singleton instance.
+
+            >>> from punq import Container
+            >>> container = Container()
+
+            >>> class DataAccessLayer:
+            ...     pass
+            ...
+            >>> class SqlAlchemyDataAccessLayer(DataAccessLayer):
+            ...     def __init__(self, engine: SQLAlchemy.Engine):
+            ...         pass
+            ...
+            >>> container.register(
+            ...     DataAccessLayer,
+            ...     instance=SqlAlchemyDataAccessLayer(create_engine("sqlite:///"))
+            ... )
+            <punq.Container object at 0x...>
+        """
+        if self._reassignments_prohibited:
+            if len(self.__registrations[service]) > 0:
+                raise ReassignmentsProhibitedException
+        self.__registrations[service].append(
+            Registration(service, Scope.singleton, lambda: instance, {}, {})
+        )
+
+    def register_concrete_service(self, service, scope):
+        """Register a service as its own implementation.
+
+        Examples:
+            If we need to register a dependency, but we don't need to
+            abstract it, we can register it as concrete.
+
+            >>> from punq import Container
+            >>> container = Container()
+            >>> class FileReader:
+            ...     def read(self):
+            ...         # Assorted legerdemain and rigmarole
+            ...         pass
+            ...
+            >>> container.register(FileReader)
+            <punq.Container object at 0x...>
+        """
+        if not inspect.isclass(service):
+            raise InvalidRegistrationException(
+                "The service %s can't be registered as its own implementation" % (repr(service))
+            )
+        if self._reassignments_prohibited:
+            if len(self.__registrations[service]) > 0:
+                raise ReassignmentsProhibitedException
+        self.__registrations[service].append(
+            Registration(service, scope, service, self._get_needs_for_ctor(service), {})
+        )
+
+    def purge_service(self, service):
+        try:
+            self.__registrations.pop(service)
+        except KeyError:
+            raise MissingDependencyException
+
+    def build_context(self, key, existing=None):
+        if existing is None:
+            return ResolutionContext(key, list(self.__getitem__(key)))
+
+        if key not in existing.targets:
+            existing.targets[key] = ResolutionTarget(key, list(self.__getitem__(key)))
+
+        return existing
+
+    def _update_localns(self, service):
+        if type(service) == type:
+            self._localns[service.__name__] = service
+        else:
+            self._localns[service] = service
+
+    def register(self, service, factory=empty, instance=empty, scope=Scope.transient, **kwargs):
+        resolve_args = kwargs or {}
+
+        if instance is not empty:
+            self.register_service_and_instance(service, instance)
+        elif factory is empty:
+            self.register_concrete_service(service, scope)
+        elif callable(factory):
+            self.register_service_and_impl(service, scope, factory, resolve_args)
+        else:
+            raise InvalidRegistrationException(
+                f"Expected a callable factory for the service {service} but received {factory}"
+            )
+
+        self._update_localns(service)
+        ensure_forward_ref(self, service, factory, instance, **kwargs)
+
+    def __getitem__(self, service):
+        return self.__registrations[service]
+
+
+class ResolutionTarget:
+    def __init__(self, key, impls):
+        self.service = key
+        self.impls = impls
+
+    def is_generic_list(self):
+        return is_generic_list(self.service)
+
+    @property
+    def generic_parameter(self):
+        return self.service.__args__[0]
+
+    def next_impl(self):
+        if len(self.impls) > 0:
+            return self.impls.pop()
+
+
+class ResolutionContext:
+    def __init__(self, key, impls):
+        self.targets = {key: ResolutionTarget(key, impls)}
+        self.cache = {}
+        self.service = key
+
+    def target(self, key):
+        return self.targets.get(key)
+
+    def has_cached(self, key):
+        return key in self.cache
+
+    def __getitem__(self, key):
+        return self.cache.get(key)
+
+    def __setitem__(self, key, instance):
+        self.cache[key] = instance
+
+    def all_registrations(self, service):
+        return self.targets[service].impls
+
+
+class Container:
+    """
+    Provides dependency registration and resolution.
+
+    This is the main entrypoint of the Punq library. In normal scenarios users
+    will only need to interact with this class.
+    """
+
+    def __init__(self, reassignments_prohibited: bool = False):
+        self._finalized = False
+        self.registrations = Registry(reassignments_prohibited)
+        self.register(Container, instance=self)
+        self._singletons = {}
+
+    def register(
+        self,
+        service: Union[Type[T], T],
+        factory: Union[Empty, Callable[..., T]] = empty,
+        instance: Union[Empty, T] = empty,
+        scope: Scope = Scope.transient,
+        **kwargs: dict[str, Any],
+    ):
+        """
+        Register a dependency into the container.
+
+        Each registration in Punq has a "service", which is the key used for
+        resolving dependencies, and either an "instance" that implements the
+        service or a "factory" that understands how to create an instance on
+        demand.
+
+        Examples:
+            If we have an object that is expensive to construct, or that
+            wraps a resouce that must not be shared, we might choose to
+            use a singleton instance.
+
+            >>> from punq import Container
+            >>> container = Container()
+
+            >>> class DataAccessLayer:
+            ...     pass
+            ...
+            >>> class SqlAlchemyDataAccessLayer(DataAccessLayer):
+            ...     def __init__(self, engine: SQLAlchemy.Engine):
+            ...         pass
+            ...
+            >>> dal = SqlAlchemyDataAccessLayer(create_engine("sqlite:///"))
+            >>> container.register(
+            ...     DataAccessLayer,
+            ...     instance=dal
+            ... )
+            <punq.Container object at 0x...>
+            >>> assert container.resolve(DataAccessLayer) is dal
+
+            If we need to register a dependency, but we don't need to
+                abstract it, we can register it as concrete.
+
+            >>> class FileReader:
+            ...     def read (self):
+            ...         # Assorted legerdemain and rigmarole
+            ...         pass
+            ...
+            >>> container.register(FileReader)
+            <punq.Container object at 0x...>
+            >>> assert type(container.resolve(FileReader)) == FileReader
+
+            In this example, the EmailSender type is an abstract class
+            and SmtpEmailSender is our concrete implementation.
+
+            >>> class EmailSender:
+            ...     def send(self, msg):
+            ...         pass
+            ...
+            >>> class SmtpEmailSender (EmailSender):
+            ...     def send(self, msg):
+            ...         print("Sending message via smtp")
+            ...
+            >>> container.register(EmailSender, SmtpEmailSender)
+            <punq.Container object at 0x...>
+            >>> instance = container.resolve(EmailSender)
+            >>> instance.send("beep")
+            Sending message via smtp
+        """
+        if self._finalized:
+            raise FinalizedException
+        self.registrations.register(service, factory, instance, scope, **kwargs)
+        return self
+
+    def resolve_all(self, service, **kwargs):
+        """
+        Return all registrations for a given service.
+
+        Some patterns require us to use multiple implementations of an
+        interface at the same time.
+
+        Examples:
+
+            In this example, we want to use multiple Authenticator instances to
+            check a request.
+
+            >>> class Authenticator:
+            ...     def matches(self, req):
+            ...         return False
+            ...
+            ...     def authenticate(self, req):
+            ...         return False
+            ...
+            >>> class BasicAuthenticator(Authenticator):
+            ...
+            ...     def matches(self, req):
+            ...         head = req.headers.get("Authorization", "")
+            ...         return head.startswith("Basic ")
+            ...
+            >>> class TokenAuthenticator(Authenticator):
+            ...
+            ...     def matches(self, req):
+            ...         head = req.headers.get("Authorization", "")
+            ...         return head.startswith("Bearer ")
+            ...
+            >>> def authenticate_request(container, req):
+            ...     for authn in req.resolve_all(Authenticator):
+            ...         if authn.matches(req):
+            ...             return authn.authenticate(req)
+        """
+        context = self.registrations.build_context(service)
+
+        return [self._build_impl(x, kwargs, context) for x in context.all_registrations(service)]
+
+    def purge(self, service):
+        self.registrations.purge_service(service)
+
+    def finalize(self) -> None:
+        self._finalized = True
+
+    def _build_impl(self, registration, resolution_args, context):
+        """Instantiate the registered service."""
+
+        spec = inspect.getfullargspec(registration.builder)
+        target_args = spec.args
+
+        args = match_defaults(spec.args, spec.defaults)
+        args.update(
+            {
+                k: self._resolve_impl(v, resolution_args, context, args.get(k))
+                for k, v in registration.needs.items()
+                if k != "return" and k not in registration.args and k not in resolution_args
+            }
+        )
+        args.update(registration.args)
+
+        if "self" in target_args:
+            target_args.remove("self")
+        condensed_resolution_args = {
+            key: resolution_args[key] for key in resolution_args if key in target_args
+        }
+        args.update(condensed_resolution_args or {})
+
+        result = registration.builder(**args)
+
+        if registration.scope == Scope.singleton:
+            self._singletons[registration.service] = result
+
+        context[registration.service] = result
+
+        return result
+
+    def _resolve_impl(self, service_key, kwargs, context, default=None):
+
+        context = self.registrations.build_context(service_key, context)
+
+        if service_key in self._singletons:
+            return self._singletons[service_key]
+
+        if context.has_cached(service_key):
+            return context[service_key]
+
+        target = context.target(service_key)
+
+        if target.is_generic_list():
+            return self.resolve_all(target.generic_parameter)
+
+        registration = target.next_impl()
+
+        if registration is None and default is not None:
+            return default
+
+        if registration is None:
+            raise MissingDependencyException(
+                "Failed to resolve implementation for " + str(service_key)
+            )
+
+        if service_key in registration.needs.values():
+            self._resolve_impl(service_key, kwargs, context)
+
+        return self._build_impl(registration, kwargs, context)
+
+    @overload
+    def resolve(self, service_key: Type[T], **kwargs: dict[str, Any]) -> T:
+        ...
+
+    @overload
+    def resolve(self, service_key: T, **kwargs: dict[str, Any]) -> T:
+        ...
+
+    def resolve(self, service_key: Union[Type[T], T], **kwargs: dict[str, Any]) -> T:
+        context = self.registrations.build_context(service_key)
+
+        return self._resolve_impl(service_key, kwargs, context)
+
+    def instantiate(self, service_key, **kwargs):
+        """
+        Instantiate an unregistered service
+        """
+        registration = Registration(
+            service_key,
+            Scope.transient,
+            service_key,
+            self.registrations._get_needs_for_ctor(service_key),
+            {},
+        )
+
+        context = ResolutionContext(service_key, list([registration]))
+
+        return self._build_impl(registration, kwargs, context)
