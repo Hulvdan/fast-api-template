@@ -28,7 +28,7 @@ filterwarnings = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10.1"
 
 # Server
 uvicorn = "^0.15.0"
@@ -73,3 +73,4 @@ isort = "^5.9.3"
 
 # Stubs
 sqlalchemy2-stubs = "^0.0.2-alpha.19"
+python-dotenv = "^0.19.2"

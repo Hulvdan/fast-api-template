@@ -1,7 +1,7 @@
 # This Dockerfile uses multi-stage build to customize DEV and PROD images:
 # https://docs.docker.com/develop/develop-images/multistage-build/
 
-FROM python:3.9.7-slim-buster AS development_build
+FROM python:3.10.1-slim-buster AS development_build
 
 ARG ENVIRONMENT
 
@@ -22,7 +22,6 @@ ENV ENVIRONMENT=${ENVIRONMENT} \
   # tini:
   TINI_VERSION=v0.19.0 \
   # poetry:
-  POETRY_VERSION=1.1.11 \
   POETRY_NO_INTERACTION=1 \
   POETRY_VIRTUALENVS_CREATE=false \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \
@@ -51,7 +50,7 @@ RUN apt-get update && apt-get upgrade -y \
   && chmod +x /usr/local/bin/tini && tini --version \
   # Installing `poetry` package manager:
   # https://github.com/python-poetry/poetry
-  && curl -sSL 'https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py' | python \
+  && pip install -Iv poetry==1.1.12 \
   && poetry --version \
   # Removing build-time-only dependencies:
   && apt-get remove -y $BUILD_ONLY_PACKAGES \
