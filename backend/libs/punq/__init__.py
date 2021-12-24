@@ -20,7 +20,41 @@ except DistributionNotFound:  # pragma no cover
     pass
 
 
-T = TypeVar("T")
+T_co = TypeVar("T_co", covariant=True)
+
+
+class AbstractClassException(Exception):
+    """
+    Raised when factory returns Abstract class.
+    Examples:
+        >>> from abc import ABC, abstractmethod
+        >>> from punq import Container
+        ... class IClient(ABC):
+        ...     @abstractmethod
+        ...     def execute(self):
+        ...         raise NotImplementedError
+        ... class Client(IClient):
+        ...     pass
+        >>> container = Container()
+        >>> container.register(IClient, Client)
+    """
+
+
+class AbstractFactoryReturnClassException(Exception):
+    """
+    Raised when factory returns Abstract class.
+    Examples:
+        >>> from abc import ABC, abstractmethod
+        >>> from punq import Container
+        ... class IClient(ABC):
+        ...     @abstractmethod
+        ...     def execute(self):
+        ...         raise NotImplementedError
+        ... def get_client_s3_implementation() -> IClient:
+        ...     return ClientS3()
+        >>> container = Container()
+        >>> container.register(IClient, factory=get_client_s3_implementation)
+    """
 
 
 class FinalizedException(Exception):
@@ -378,9 +412,9 @@ class Container:
 
     def register(
         self,
-        service: Union[Type[T], T],
-        factory: Union[Empty, Callable[..., T]] = empty,
-        instance: Union[Empty, T] = empty,
+        service: Type[T_co],
+        factory: Union[Empty, Callable[..., T_co]] = empty,
+        instance: Union[Empty, T_co] = empty,
         scope: Scope = Scope.transient,
         **kwargs: dict[str, Any],
     ):
@@ -446,6 +480,14 @@ class Container:
         """
         if self._finalized:
             raise FinalizedException
+        if isinstance(factory, type):
+            if inspect.isabstract(factory):
+                raise AbstractClassException
+        elif callable(factory):
+            annotations = get_type_hints(factory)
+            return_type = annotations["return"]
+            if inspect.isabstract(return_type):
+                raise AbstractFactoryReturnClassException
         self.registrations.register(service, factory, instance, scope, **kwargs)
         return self
 
@@ -557,15 +599,7 @@ class Container:
 
         return self._build_impl(registration, kwargs, context)
 
-    @overload
-    def resolve(self, service_key: Type[T], **kwargs: dict[str, Any]) -> T:
-        ...
-
-    @overload
-    def resolve(self, service_key: T, **kwargs: dict[str, Any]) -> T:
-        ...
-
-    def resolve(self, service_key: Union[Type[T], T], **kwargs: dict[str, Any]) -> T:
+    def resolve(self, service_key: Type[T_co], **kwargs: dict[str, Any]) -> T_co:
         context = self.registrations.build_context(service_key)
 
         return self._resolve_impl(service_key, kwargs, context)
