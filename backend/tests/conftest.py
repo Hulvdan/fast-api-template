@@ -7,8 +7,9 @@ from typing import Callable
 import httpx
 from PIL import Image
 from pytest import fixture
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from common.services.implementations.storage_mock import StorageMock
+from common.services.interfaces.storage import IStorage
 from core.config import AuthConfig
 from core.resources.database import DatabaseResource
 from libs.punq import Container
@@ -23,9 +24,17 @@ def pytest_sessionstart():
 
 @fixture(scope="session")
 def container() -> Container:
-    from core.container import initialize_container
+    """Тут мы переопределяем сервисы на моки.
 
-    container = initialize_container()
+    Например, смс-ки, email-ы, файлы и т.п.
+    """
+    from core.container import get_container
+
+    container = get_container()
+
+    container.purge(IStorage)
+    container.register(IStorage, StorageMock)
+
     container.finalize()
     return container
 

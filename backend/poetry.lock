@@ -731,6 +731,14 @@ idna = {version = "*", optional = true, markers = "extra == \"idna2008\""}
 idna2008 = ["idna"]
 
 [[package]]
+name = "rstr"
+version = "3.0.0"
+description = "Generate random strings in Python"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "s3transfer"
 version = "0.5.0"
 description = "An Amazon S3 Transfer Manager"
@@ -947,8 +955,8 @@ multidict = ">=4.0"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.9"
-content-hash = "e513c2bd3887e1a9eeccce05e931e69e71b358a8420ebce69ee9ccfc2ce36a95"
+python-versions = "^3.10.1"
+content-hash = "eae62f39ac373e6297a99686bebd541568b9b98f42e8686cd45442e040468187"
 
 [metadata.files]
 aioboto3 = [
@@ -1595,6 +1603,10 @@ requests = [
 rfc3986 = [
     {file = "rfc3986-1.5.0-py2.py3-none-any.whl", hash = "sha256:a86d6e1f5b1dc238b218b012df0aa79409667bb209e58da56d0b94704e712a97"},
     {file = "rfc3986-1.5.0.tar.gz", hash = "sha256:270aaf10d87d0d4e095063c65bf3ddbc6ee3d0b226328ce21e036f946e421835"},
+]
+rstr = [
+    {file = "rstr-3.0.0-py2.py3-none-any.whl", hash = "sha256:991dc613509e6c69bee088b122e5c46eea6238079e4e6d1865bf4fafea0cda33"},
+    {file = "rstr-3.0.0.tar.gz", hash = "sha256:bc3d4f929e34dcde3d90884bc9217a465069f51164f4220c8e551205a882e9b7"},
 ]
 s3transfer = [
     {file = "s3transfer-0.5.0-py3-none-any.whl", hash = "sha256:9c1dc369814391a6bda20ebbf4b70a0f34630592c9aa520856bf384916af2803"},

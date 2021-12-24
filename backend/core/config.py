@@ -15,6 +15,10 @@ class AppConfig(BaseSettings):
         "hello_world",
     ]
 
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+
 
 class AuthConfig(BaseSettings):
     jwt_expiration_delta = Field(env="ACCESS_TOKEN_EXPIRE_MINUTES", default=600)
@@ -23,6 +27,10 @@ class AuthConfig(BaseSettings):
     jwt_secret_key: str = Field(env="JWT_SECRET_KEY", default="dumb_secret_key")
     oauth_scopes = {"read": "Read", "write": "Write"}
     secret_key = Field(env="BACKEND_SECRET_KEY", default="dumb_secret_key")
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
 
 
 class DatabaseConfig(BaseSettings):
@@ -43,3 +51,18 @@ class DatabaseConfig(BaseSettings):
             port=self.port,
             database=self.database,
         )
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+
+
+class AWSSettings(BaseSettings):
+    access_key_id: str = Field(env="AWS_ACCESS_KEY_ID")
+    secret_access_key: str = Field(env="AWS_SECRET_ACCESS_KEY")
+    storage_bucket_name: str = Field(env="AWS_STORAGE_BUCKET_NAME")
+    endpoint_url: str = Field(env="AWS_S3_ENDPOINT_URL")
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
