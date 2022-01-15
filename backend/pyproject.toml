@@ -41,33 +41,25 @@ alembic = "^1.7.4"
 asyncpg = "^0.24.0"
 psycopg2-binary = "^2.9.1"
 
-# Framework
+# Web-Framework
 fastapi = "^0.70.0"
 pydantic = "^1.8.2"
+python-multipart = "^0.0.5"
 
 # Utils
 Pillow = "^8.4.0"
 PyJWT = "^2.3.0"
 aioboto3 = "^9.2.2"
-aiohttp = "^3.7.4"
-email-validator = "^1.1.3"
-python-multipart = "^0.0.5"
-requests = "^2.26.0"
 rstr = "^3.0.0"
-ujson = "^4.2.0"
 
 # Typehinting
 mypy = "^0.910"
 mypy-extensions = "^0.4.3"
 
-# Tests
-factory-boy = "^3.2.0"
-httpx = "^0.20.0"
-pytest = "^6.2.5"
-pytest-asyncio = "^0.16.0"
-pytest-xdist = "^2.4.0"
-
 [tool.poetry.dev-dependencies]
+# Linting
+flake8 = "^4.0.1"
+
 # Formatting
 black = "^21.9b0"
 isort = "^5.9.3"
@@ -75,3 +67,9 @@ isort = "^5.9.3"
 # Stubs
 sqlalchemy2-stubs = "^0.0.2-alpha.19"
 python-dotenv = "^0.19.2"
+
+# Tests
+httpx = "^0.20.0"
+pytest = "^6.2.5"
+pytest-asyncio = "^0.16.0"
+pytest-xdist = "^2.4.0"
