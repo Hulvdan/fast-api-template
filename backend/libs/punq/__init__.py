@@ -531,7 +531,7 @@ class Container:
 
         return [self._build_impl(x, kwargs, context) for x in context.all_registrations(service)]
 
-    def purge(self, service):
+    def purge(self, service: Any) -> None:
         self.registrations.purge_service(service)
 
     def finalize(self) -> None:

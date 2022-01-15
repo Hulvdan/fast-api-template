@@ -7,6 +7,6 @@ from starlette.responses import Response
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/health-check")
 def health_check() -> Any:
     return Response(status_code=status.HTTP_200_OK)

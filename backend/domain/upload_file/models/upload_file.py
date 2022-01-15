@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
-class PostHelloWorldResponse(BaseModel):
+class UploadFileResponse(BaseModel):
     url: str
     filename: str
     key: str

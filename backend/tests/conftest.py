@@ -2,10 +2,10 @@ import asyncio
 import io
 import logging
 import os
-from typing import Callable
+from typing import AsyncGenerator, Callable, Generator
 
 import httpx
-from PIL import Image
+from PIL import Image  # type: ignore[import]
 from pytest import fixture
 
 from common.services.implementations.storage_mock import StorageMock
@@ -18,7 +18,7 @@ logger = logging.getLogger("fixture")
 logger.setLevel(logging.INFO)
 
 
-def pytest_sessionstart():
+def pytest_sessionstart() -> None:
     os.environ["POSTGRES_DB"] = "postgres_test"
 
 
@@ -33,14 +33,14 @@ def container() -> Container:
     container = get_container()
 
     container.purge(IStorage)
-    container.register(IStorage, StorageMock)
+    container.register(IStorage, StorageMock)  # type: ignore[misc]
 
     container.finalize()
     return container
 
 
 @fixture(scope="session", autouse=True)
-def db(container) -> None:
+def db(container: Container) -> Generator[None, None, None]:
     """Инициализация БД для тестов.
 
     Создание БД при старте тестов и удаление при завершении.
@@ -63,8 +63,8 @@ def event_loop() -> asyncio.AbstractEventLoop:
 
 
 @fixture(scope="function")
-async def client() -> httpx.AsyncClient:
-    from core.application import create_app
+async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
+    from application.web.application import create_app
 
     app = await create_app()
     async with httpx.AsyncClient(base_url="http://localhost:8000", app=app) as client:
@@ -72,8 +72,8 @@ async def client() -> httpx.AsyncClient:
 
 
 @fixture(scope="function")
-def image_factory() -> Callable[..., io.BytesIO]:
-    def get_image(image_name) -> io.BytesIO:
+def image_factory() -> Callable[[str], io.BytesIO]:
+    def get_image(image_name: str) -> io.BytesIO:
         file = io.BytesIO()
         image = Image.new("RGBA", size=(100, 100), color=(155, 0, 0))
         image.save(file, "png")

@@ -12,7 +12,7 @@ class AppConfig(BaseSettings):
     base_dir = BASE_DIR
     apps: list[str] = [
         "health_check",
-        "hello_world",
+        "upload_file",
     ]
 
     class Config:

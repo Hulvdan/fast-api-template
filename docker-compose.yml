@@ -48,7 +48,7 @@ services:
         - webnet
       env_file: backend/.env
 
-    command: sh scripts/runserver.sh
+    command: python -m application.web.main
     # healthcheck:
     #   # We use `$$` here because:
     #   # one `$` goes to shell,

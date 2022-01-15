@@ -2,7 +2,7 @@ from common.services.interfaces.storage import FileMeta, IAsyncFile, IStorage
 from core.base import BaseUseCase
 
 
-class HelloWorldUseCase(BaseUseCase):
+class UploadFileUseCase(BaseUseCase):
     def __init__(self, storage_service: IStorage) -> None:
         self.storage_service = storage_service
         self.upload_path = "h/w"

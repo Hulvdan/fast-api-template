@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TypedDict
 
-from aioboto3.session import Session
+from aioboto3.session import Session  # type: ignore[import]
 
 from core.config import AWSSettings
 

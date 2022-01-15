@@ -1,4 +1,4 @@
-from rstr import xeger
+from rstr import xeger  # type: ignore[import]
 
 from ..interfaces.random_re import IRandomRe
 

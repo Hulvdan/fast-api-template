@@ -48,7 +48,7 @@ def _load_use_cases(container: punq.Container) -> None:
     apps = container.resolve(AppConfig).apps
     for app in apps:
         try:
-            use_cases_module = importlib.import_module(f"apps.{app}.use_cases")
+            use_cases_module = importlib.import_module(f"domain.{app}.use_cases")
         except ModuleNotFoundError:
             continue
 

@@ -5,23 +5,17 @@ from fastapi import Depends, File, UploadFile
 from fastapi.routing import APIRouter
 
 from core.container import get_container
+from domain.upload_file import models, use_cases
 from libs.punq import Container
-
-from . import models, use_cases
 
 router = APIRouter()
 
 
-@router.get("/", status_code=HTTPStatus.OK)
-async def get_hello_world() -> Any:
-    return dict(message="Hello World")
-
-
-@router.post("/", status_code=HTTPStatus.OK, response_model=models.PostHelloWorldResponse)
-async def post_hello_world(
+@router.post("/", status_code=HTTPStatus.OK, response_model=models.UploadFileResponse)
+async def upload_file(
     image: UploadFile = File(...), container: Container = Depends(get_container)
 ) -> Any:
-    file_meta = await container.resolve(use_cases.HelloWorldUseCase).execute(image)
+    file_meta = await container.resolve(use_cases.UploadFileUseCase).execute(image)
     return dict(
         url=file_meta.url,
         filename=file_meta.filename,
