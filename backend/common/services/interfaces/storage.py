@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import NamedTuple, Protocol, Union
 
+from common.config import AWSSettings
 from common.services.interfaces.random_re import IRandomRe
-from core.config import AWSSettings
 
 
 class FileMeta(NamedTuple):

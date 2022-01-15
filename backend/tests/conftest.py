@@ -8,10 +8,10 @@ import httpx
 from PIL import Image  # type: ignore[import]
 from pytest import fixture
 
+from common.config import AuthConfig
+from common.resources.database import DatabaseResource
 from common.services.implementations.storage_mock import StorageMock
 from common.services.interfaces.storage import IStorage
-from core.config import AuthConfig
-from core.resources.database import DatabaseResource
 from libs.punq import Container
 
 logger = logging.getLogger("fixture")
@@ -28,7 +28,7 @@ def container() -> Container:
 
     Например, смс-ки, email-ы, файлы и т.п.
     """
-    from core.container import get_container
+    from common.container import get_container
 
     container = get_container()
 

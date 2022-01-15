@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from core.config import AWSSettings
+from common.config import AWSSettings
 
 from ..interfaces.random_re import IRandomRe
 from ..interfaces.storage import FileMeta, IAsyncFile, IStorage

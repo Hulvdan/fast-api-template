@@ -1,5 +1,5 @@
+from common.base import BaseUseCase
 from common.services.interfaces.storage import FileMeta, IAsyncFile, IStorage
-from core.base import BaseUseCase
 
 
 class UploadFileUseCase(BaseUseCase):

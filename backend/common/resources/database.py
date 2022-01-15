@@ -1,4 +1,3 @@
-import logging
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator, cast
 
@@ -6,11 +5,8 @@ from sqlalchemy import create_engine, orm
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy_utils import create_database, database_exists, drop_database  # type: ignore[import]
 
-from core.db import Base
-
-from ..config import DatabaseConfig
-
-logger = logging.getLogger(__name__)
+from common.config import DatabaseConfig
+from common.db import Base
 
 
 class DatabaseResource:

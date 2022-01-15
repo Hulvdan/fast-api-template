@@ -4,7 +4,7 @@ from typing import Any
 from fastapi import Depends, File, UploadFile
 from fastapi.routing import APIRouter
 
-from core.container import get_container
+from common.container import get_container
 from domain.upload_file import models, use_cases
 from libs.punq import Container
 

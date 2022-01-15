@@ -3,7 +3,7 @@ from typing import TypedDict
 
 from aioboto3.session import Session  # type: ignore[import]
 
-from core.config import AWSSettings
+from common.config import AWSSettings
 
 from ..interfaces.random_re import IRandomRe
 from ..interfaces.storage import FileMeta, IAsyncFile, IStorage

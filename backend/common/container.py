@@ -3,11 +3,11 @@ import inspect
 from functools import lru_cache
 from typing import Any
 
+from common.base import BaseUseCase
 from common.services.implementations.random_re_rstr import RandomReXeger
 from common.services.implementations.storage_s3 import StorageS3
 from common.services.interfaces.random_re import IRandomRe
 from common.services.interfaces.storage import IStorage
-from core.base import BaseUseCase
 from libs import punq
 
 from .config import AppConfig, AuthConfig, AWSSettings, DatabaseConfig
