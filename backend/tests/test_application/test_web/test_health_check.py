@@ -1,9 +1,10 @@
+import pytest
 from httpx import AsyncClient
-from pytest import mark
 from starlette import status
 
 
-@mark.asyncio
+@pytest.mark.asyncio()
+@pytest.mark.web()
 class TestHealthCheck:
     async def test_health_check(self, client: AsyncClient) -> None:
         response = await client.get("/api/v1/health-check", follow_redirects=True)

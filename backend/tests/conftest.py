@@ -1,12 +1,11 @@
 import asyncio
 import io
-import logging
 import os
 from typing import AsyncGenerator, Callable, Generator, Union
 
 import httpx
+import pytest
 from PIL import Image  # type: ignore[import]
-from pytest import fixture
 
 from common.config import AuthConfig
 from common.resources.database import DatabaseResource
@@ -14,15 +13,12 @@ from common.services.storage import IAsyncFile, IStorage
 from infrastructure.services.storage_mock import StorageMock
 from libs.punq import Container
 
-logger = logging.getLogger("fixture")
-logger.setLevel(logging.INFO)
-
 
 def pytest_sessionstart() -> None:
     os.environ["POSTGRES_DB"] = "postgres_test"
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def container() -> Container:
     """Тут мы переопределяем сервисы на моки.
 
@@ -39,8 +35,8 @@ def container() -> Container:
     return container
 
 
-@fixture(scope="session", autouse=True)
-def db(container: Container) -> Generator[None, None, None]:
+@pytest.fixture(scope="session", autouse=True)
+def _db(container: Container) -> Generator[None, None, None]:
     """Инициализация БД для тестов.
 
     Создание БД при старте тестов и удаление при завершении.
@@ -52,17 +48,17 @@ def db(container: Container) -> Generator[None, None, None]:
     db.drop_database()
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def auth_config(container: Container) -> AuthConfig:
     return container.resolve(AuthConfig)
 
 
-@fixture(scope="session")
+@pytest.fixture(scope="session")
 def event_loop() -> asyncio.AbstractEventLoop:
     return asyncio.get_event_loop()
 
 
-@fixture(scope="function")
+@pytest.fixture()
 async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
     from application.web.application import create_app
 
@@ -71,7 +67,7 @@ async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
         yield client
 
 
-@fixture(scope="function")
+@pytest.fixture()
 def image_factory() -> Callable[[str], io.BytesIO]:
     def get_image(image_name: str) -> io.BytesIO:
         file = io.BytesIO()
@@ -101,7 +97,7 @@ class AsyncImage:
         self._file.close()
 
 
-@fixture(scope="function")
+@pytest.fixture()
 def async_file_factory() -> Callable[[str], IAsyncFile]:
     def get_async_file(file_name: str) -> IAsyncFile:
         file = io.BytesIO()

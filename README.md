@@ -57,6 +57,12 @@ Found 1 error in 1 file (checked 1 source file)
 На моей практике использование mypy значительно уменьшает количество таких
 ошибок во время рефакторинга и переработок существующего функционала.
 
+### [flake8][Flake8Link]
+
+Flake8 - линтер. Линтеры помогают поддерживать код однородным и легким для
+восприятия. Функционал Flake8 расширяется путём добавления плагинов,
+которые вносят новые правила проверки кода.
+
 ### [poetry][PoetryLink]
 
 На данный момент - это самый лучший менеджер Python пакетов.
@@ -138,6 +144,7 @@ poetry install
 [BlackLink]: https://github.com/psf/black "Black"
 [IsortLink]: https://github.com/PyCQA/isort "isort"
 [MypyLink]: https://mypy.readthedocs.io/ "mypy"
+[Flake8Link]: https://github.com/pycqa/flake8 "flake8"
 [PoetryLink]: https://python-poetry.org/ "Poetry"
 [PunqLink]: https://github.com/bobthemighty/punq "punq"
 [DIConferenceLink]: https://www.youtube.com/watch?v=3Z_3yCgVKkM

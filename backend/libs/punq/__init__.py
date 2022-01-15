@@ -7,7 +7,7 @@ https://github.com/Hulvdan/punq forked from https://github.com/bobthemighty/punq
 import inspect
 from collections import defaultdict
 from enum import Enum
-from typing import Any, Callable, List, NamedTuple, Type, TypeVar, Union, get_type_hints, overload
+from typing import Any, Callable, List, NamedTuple, Type, TypeVar, Union, get_type_hints
 
 from pkg_resources import DistributionNotFound, get_distribution
 
@@ -110,15 +110,11 @@ class MissingDependencyException(Exception):
         punq.MissingDependencyException: Failed to resolve implementation for foo
     """
 
-    pass
-
 
 class InvalidRegistrationException(Exception):
     """
     Raised when a registration would result in an unresolvable service.
     """
-
-    pass
 
 
 class InvalidForwardReferenceException(Exception):
@@ -172,8 +168,6 @@ class InvalidForwardReferenceException(Exception):
 
     """
 
-    pass
-
 
 class Scope(Enum):
     transient = 0
@@ -205,7 +199,7 @@ def match_defaults(args, defaults):
     """
 
     if defaults is None:
-        return dict()
+        return {}
 
     offset = len(args) - len(defaults)
     defaults = ([None] * offset) + list(defaults)
@@ -216,7 +210,7 @@ def match_defaults(args, defaults):
 class Registry:
     def __init__(self, reassignments_prohibited: bool):
         self.__registrations = defaultdict(list)
-        self._localns = dict()
+        self._localns = {}
         self._reassignments_prohibited = reassignments_prohibited
 
     def _get_needs_for_ctor(self, cls):
@@ -249,9 +243,8 @@ class Registry:
              >>> instance.send("Hello")
              Sending message via smtp: Hello
         """
-        if self._reassignments_prohibited:
-            if len(self.__registrations[service]) > 0:
-                raise ReassignmentsProhibitedException
+        if self._reassignments_prohibited and len(self.__registrations[service]) > 0:
+            raise ReassignmentsProhibitedException
         self.__registrations[service].append(
             Registration(service, scope, impl, self._get_needs_for_ctor(impl), resolve_args)
         )
@@ -280,9 +273,8 @@ class Registry:
             ... )
             <punq.Container object at 0x...>
         """
-        if self._reassignments_prohibited:
-            if len(self.__registrations[service]) > 0:
-                raise ReassignmentsProhibitedException
+        if self._reassignments_prohibited and len(self.__registrations[service]) > 0:
+            raise ReassignmentsProhibitedException
         self.__registrations[service].append(
             Registration(service, Scope.singleton, lambda: instance, {}, {})
         )
@@ -306,11 +298,10 @@ class Registry:
         """
         if not inspect.isclass(service):
             raise InvalidRegistrationException(
-                "The service %s can't be registered as its own implementation" % (repr(service))
+                "The service {} can't be registered as its own implementation".format(repr(service))
             )
-        if self._reassignments_prohibited:
-            if len(self.__registrations[service]) > 0:
-                raise ReassignmentsProhibitedException
+        if self._reassignments_prohibited and len(self.__registrations[service]) > 0:
+            raise ReassignmentsProhibitedException
         self.__registrations[service].append(
             Registration(service, scope, service, self._get_needs_for_ctor(service), {})
         )
@@ -331,7 +322,7 @@ class Registry:
         return existing
 
     def _update_localns(self, service):
-        if type(service) == type:
+        if type(service) == type:  # noqa: PIE789
             self._localns[service.__name__] = service
         else:
             self._localns[service] = service
@@ -616,6 +607,6 @@ class Container:
             {},
         )
 
-        context = ResolutionContext(service_key, list([registration]))
+        context = ResolutionContext(service_key, [registration])
 
         return self._build_impl(registration, kwargs, context)

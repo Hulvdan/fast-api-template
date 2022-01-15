@@ -34,7 +34,7 @@ class AuthConfig(BaseSettings):
 
 
 class DatabaseConfig(BaseSettings):
-    type = "postgresql+asyncpg"
+    protocol = "postgresql+asyncpg"
     database: str = Field(env="POSTGRES_DB")
     username: str = Field(env="POSTGRES_USER")
     password: str = Field(env="POSTGRES_PASSWORD")
@@ -43,8 +43,8 @@ class DatabaseConfig(BaseSettings):
 
     @property
     def database_url(self) -> str:
-        return "{type}://{username}:{password}@{host}:{port}/{database}".format(
-            type=self.type,
+        return "{protocol}://{username}:{password}@{host}:{port}/{database}".format(
+            protocol=self.protocol,
             username=self.username,
             password=self.password,
             host=self.host,

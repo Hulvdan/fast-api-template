@@ -43,3 +43,9 @@ repos:
         language: system
         files: ^backend/.*.(py|pyi)$
         pass_filenames: false
+
+      - id: backend-flake8
+        name: backend-flake8
+        entry: backend/.venv/bin/flake8 --config backend/setup.cfg
+        language: system
+        files: ^backend/.*.(py|pyi)$

@@ -39,22 +39,22 @@ class StorageS3(IStorage):
         self.aws_access_key_id = self.storage_config.access_key_id
         self.aws_secret_access_key = self.storage_config.secret_access_key
 
-        self.session_options = dict(
-            aws_access_key_id=self.aws_access_key_id,
-            aws_secret_access_key=self.aws_secret_access_key,
-        )
-        self.client_options = dict(
-            service_name=self.service_name,
-            endpoint_url=self.endpoint_url,
-            aws_access_key_id=self.aws_access_key_id,
-            aws_secret_access_key=self.aws_secret_access_key,
-        )
-        self.resource_options = dict(
-            service_name=self.service_name,
-            endpoint_url=self.endpoint_url,
-            aws_access_key_id=self.aws_access_key_id,
-            aws_secret_access_key=self.aws_secret_access_key,
-        )
+        self.session_options = {
+            "aws_access_key_id": self.aws_access_key_id,
+            "aws_secret_access_key": self.aws_secret_access_key,
+        }
+        self.client_options = {
+            "service_name": self.service_name,
+            "endpoint_url": self.endpoint_url,
+            "aws_access_key_id": self.aws_access_key_id,
+            "aws_secret_access_key": self.aws_secret_access_key,
+        }
+        self.resource_options = {
+            "service_name": self.service_name,
+            "endpoint_url": self.endpoint_url,
+            "aws_access_key_id": self.aws_access_key_id,
+            "aws_secret_access_key": self.aws_secret_access_key,
+        }
 
         self.session: Session = Session(**self.session_options)
 
