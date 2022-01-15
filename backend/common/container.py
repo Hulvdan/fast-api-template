@@ -53,13 +53,13 @@ def _load_use_cases(container: punq.Container) -> None:
             continue
 
         module_members: list[tuple[str, Any]] = inspect.getmembers(use_cases_module)
-
         for member_name, member in module_members:
             member_mro = getattr(member, "mro", None)
             if member_mro is None:
                 continue
 
-            if BaseUseCase in member_mro():
+            mro = member_mro()
+            if len(mro) > 2 and BaseUseCase in mro:
                 if member_name in loaded_use_cases:
                     continue
 
