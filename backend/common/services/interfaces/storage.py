@@ -8,18 +8,13 @@ from common.services.interfaces.random_re import IRandomRe
 
 class FileMeta(NamedTuple):
     url: str
-    filename: str
     key: str
-    content_type: str
     last_modified: datetime
     content_length: int
     upload_path: str
 
 
 class IAsyncFile(Protocol):
-    filename: str
-    content_type: str
-
     async def write(self, data: Union[bytes, str]) -> None:
         ...
 

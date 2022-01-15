@@ -22,9 +22,7 @@ class StorageMock(IStorage):
 
         return FileMeta(
             url=file_url,
-            filename=file.filename,
             key=random_str,
-            content_type=file.content_type,
             last_modified=datetime.now(),
             content_length=1,
             upload_path=upload_path,

@@ -6,6 +6,7 @@ from pytest import mark
 
 
 @mark.asyncio
+@mark.web
 async def test_upload_file_view(
     client: AsyncClient, image_factory: Callable[..., io.BytesIO]
 ) -> None:

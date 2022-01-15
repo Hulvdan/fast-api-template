@@ -2,7 +2,7 @@ import asyncio
 import io
 import logging
 import os
-from typing import AsyncGenerator, Callable, Generator
+from typing import AsyncGenerator, Callable, Generator, Union
 
 import httpx
 from PIL import Image  # type: ignore[import]
@@ -11,7 +11,7 @@ from pytest import fixture
 from common.config import AuthConfig
 from common.resources.database import DatabaseResource
 from common.services.implementations.storage_mock import StorageMock
-from common.services.interfaces.storage import IStorage
+from common.services.interfaces.storage import IAsyncFile, IStorage
 from libs.punq import Container
 
 logger = logging.getLogger("fixture")
@@ -82,3 +82,33 @@ def image_factory() -> Callable[[str], io.BytesIO]:
         return file
 
     return get_image
+
+
+class AsyncImage:
+    def __init__(self, file: io.BytesIO) -> None:
+        self._file = file
+
+    async def write(self, data: Union[bytes, str]) -> None:
+        self._file.write(data)  # type: ignore
+
+    async def read(self, size: int = -1) -> Union[bytes, str]:
+        return self._file.read(size)
+
+    async def seek(self, offset: int) -> None:
+        self._file.seek(offset)
+
+    async def close(self) -> None:
+        self._file.close()
+
+
+@fixture(scope="function")
+def async_file_factory() -> Callable[[str], IAsyncFile]:
+    def get_async_file(file_name: str) -> IAsyncFile:
+        file = io.BytesIO()
+        image = Image.new("RGBA", size=(100, 100), color=(155, 0, 0))
+        image.save(file, "png")
+        file.name = file_name
+        file.seek(0)
+        return AsyncImage(file)
+
+    return get_async_file
