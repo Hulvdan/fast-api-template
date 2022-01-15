@@ -1,6 +1,6 @@
 from rstr import xeger  # type: ignore[import]
 
-from ..interfaces.random_re import IRandomRe
+from common.services.random_re import IRandomRe
 
 
 class RandomReXeger(IRandomRe):

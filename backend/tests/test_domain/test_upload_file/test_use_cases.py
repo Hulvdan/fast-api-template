@@ -2,7 +2,7 @@ from typing import Callable
 
 from pytest import mark
 
-from common.services.interfaces.storage import IAsyncFile
+from common.services.storage import IAsyncFile
 from domain.upload_file.use_cases import UploadFileUseCase
 from libs.punq import Container
 

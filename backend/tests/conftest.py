@@ -10,8 +10,8 @@ from pytest import fixture
 
 from common.config import AuthConfig
 from common.resources.database import DatabaseResource
-from common.services.implementations.storage_mock import StorageMock
-from common.services.interfaces.storage import IAsyncFile, IStorage
+from common.services.storage import IAsyncFile, IStorage
+from infrastructure.services.storage_mock import StorageMock
 from libs.punq import Container
 
 logger = logging.getLogger("fixture")

@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import NamedTuple, Protocol, Union
 
 from common.config import AWSSettings
-from common.services.interfaces.random_re import IRandomRe
+from common.services.random_re import IRandomRe
 
 
 class FileMeta(NamedTuple):

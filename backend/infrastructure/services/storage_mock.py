@@ -1,9 +1,8 @@
 from datetime import datetime
 
 from common.config import AWSSettings
-
-from ..interfaces.random_re import IRandomRe
-from ..interfaces.storage import FileMeta, IAsyncFile, IStorage
+from common.services.random_re import IRandomRe
+from common.services.storage import FileMeta, IAsyncFile, IStorage
 
 
 class StorageMock(IStorage):
