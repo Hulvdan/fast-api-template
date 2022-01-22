@@ -21,7 +21,7 @@ echo >&2 'Postgres is up - continuing...'
 
 # Applying migrations
 echo >&2 'Applying migrations...'
-sh scripts/migrate.sh head
+sh common/resources/database/scripts/migrate.sh head
 
 # Evaluating passed command (do not touch):
 # shellcheck disable=SC2086
