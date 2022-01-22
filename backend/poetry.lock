@@ -357,6 +357,18 @@ flake8 = "*"
 test = ["coverage", "coveralls", "mock", "pytest", "pytest-cov"]
 
 [[package]]
+name = "flake8-class-attributes-order"
+version = "0.1.2"
+description = "A flake8 extension that checks classes attributes order"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+flake8 = "*"
+typing-extensions = "*"
+
+[[package]]
 name = "flake8-comprehensions"
 version = "3.8.0"
 description = "A flake8 plugin to help you write better list/set/dict comprehensions."
@@ -1097,7 +1109,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10.1"
-content-hash = "42bc89dbb99f38262e0dc000a205f261a132b84351d40abf68ed7a2346937d8f"
+content-hash = "f994a74787bd83f0610a9d9618fd2cffca214438ddcacb13231fe1ce793088d2"
 
 [metadata.files]
 aioboto3 = [
@@ -1286,6 +1298,9 @@ flake8-bugbear = [
 flake8-builtins = [
     {file = "flake8-builtins-1.5.3.tar.gz", hash = "sha256:09998853b2405e98e61d2ff3027c47033adbdc17f9fe44ca58443d876eb00f3b"},
     {file = "flake8_builtins-1.5.3-py2.py3-none-any.whl", hash = "sha256:7706babee43879320376861897e5d1468e396a40b8918ed7bccf70e5f90b8687"},
+]
+flake8-class-attributes-order = [
+    {file = "flake8_class_attributes_order-0.1.2.tar.gz", hash = "sha256:48c68828590078eba062782c611f9540fd7c0fb8450dc4576b9cb6e826d9fdcf"},
 ]
 flake8-comprehensions = [
     {file = "flake8-comprehensions-3.8.0.tar.gz", hash = "sha256:8e108707637b1d13734f38e03435984f6b7854fa6b5a4e34f93e69534be8e521"},

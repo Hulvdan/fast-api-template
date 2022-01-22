@@ -213,12 +213,6 @@ class Registry:
         self._localns = {}
         self._reassignments_prohibited = reassignments_prohibited
 
-    def _get_needs_for_ctor(self, cls):
-        try:
-            return get_type_hints(cls.__init__, None, self._localns)
-        except NameError as e:
-            raise InvalidForwardReferenceException(str(e))
-
     def register_service_and_impl(self, service, scope, impl, resolve_args):
         """Registers a concrete implementation of an abstract service.
 
@@ -321,12 +315,6 @@ class Registry:
 
         return existing
 
-    def _update_localns(self, service):
-        if type(service) == type:  # noqa: PIE789
-            self._localns[service.__name__] = service
-        else:
-            self._localns[service] = service
-
     def register(self, service, factory=empty, instance=empty, scope=Scope.transient, **kwargs):
         resolve_args = kwargs or {}
 
@@ -347,18 +335,30 @@ class Registry:
     def __getitem__(self, service):
         return self.__registrations[service]
 
+    def _get_needs_for_ctor(self, cls):
+        try:
+            return get_type_hints(cls.__init__, None, self._localns)
+        except NameError as e:
+            raise InvalidForwardReferenceException(str(e))
+
+    def _update_localns(self, service):
+        if type(service) == type:  # noqa: PIE789
+            self._localns[service.__name__] = service
+        else:
+            self._localns[service] = service
+
 
 class ResolutionTarget:
     def __init__(self, key, impls):
         self.service = key
         self.impls = impls
 
-    def is_generic_list(self):
-        return is_generic_list(self.service)
-
     @property
     def generic_parameter(self):
         return self.service.__args__[0]
+
+    def is_generic_list(self):
+        return is_generic_list(self.service)
 
     def next_impl(self):
         if len(self.impls) > 0:
@@ -377,14 +377,14 @@ class ResolutionContext:
     def has_cached(self, key):
         return key in self.cache
 
+    def all_registrations(self, service):
+        return self.targets[service].impls
+
     def __getitem__(self, key):
         return self.cache.get(key)
 
     def __setitem__(self, key, instance):
         self.cache[key] = instance
-
-    def all_registrations(self, service):
-        return self.targets[service].impls
 
 
 class Container:
@@ -528,6 +528,27 @@ class Container:
     def finalize(self) -> None:
         self._finalized = True
 
+    def resolve(self, service_key: Type[T_co], **kwargs: dict[str, Any]) -> T_co:
+        context = self.registrations.build_context(service_key)
+
+        return self._resolve_impl(service_key, kwargs, context)
+
+    def instantiate(self, service_key, **kwargs):
+        """
+        Instantiate an unregistered service
+        """
+        registration = Registration(
+            service_key,
+            Scope.transient,
+            service_key,
+            self.registrations._get_needs_for_ctor(service_key),
+            {},
+        )
+
+        context = ResolutionContext(service_key, [registration])
+
+        return self._build_impl(registration, kwargs, context)
+
     def _build_impl(self, registration, resolution_args, context):
         """Instantiate the registered service."""
 
@@ -587,26 +608,5 @@ class Container:
 
         if service_key in registration.needs.values():
             self._resolve_impl(service_key, kwargs, context)
-
-        return self._build_impl(registration, kwargs, context)
-
-    def resolve(self, service_key: Type[T_co], **kwargs: dict[str, Any]) -> T_co:
-        context = self.registrations.build_context(service_key)
-
-        return self._resolve_impl(service_key, kwargs, context)
-
-    def instantiate(self, service_key, **kwargs):
-        """
-        Instantiate an unregistered service
-        """
-        registration = Registration(
-            service_key,
-            Scope.transient,
-            service_key,
-            self.registrations._get_needs_for_ctor(service_key),
-            {},
-        )
-
-        context = ResolutionContext(service_key, [registration])
 
         return self._build_impl(registration, kwargs, context)
