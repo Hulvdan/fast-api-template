@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from common.config import AWSSettings
+from common.config import Config
 from common.services.random_re import IRandomRe
 from common.services.storage import FileMeta, IAsyncFile, IStorage
 
@@ -8,8 +8,8 @@ from common.services.storage import FileMeta, IAsyncFile, IStorage
 class StorageMock(IStorage):
     """Мок хранилища файлов для тестов."""
 
-    def __init__(self, storage_config: AWSSettings, random_re: IRandomRe) -> None:
-        self.storage_config = storage_config
+    def __init__(self, config: Config, random_re: IRandomRe) -> None:
+        self.aws_config = config.aws
         self.random_re = random_re
 
     async def upload_file(self, file: IAsyncFile, upload_path: str) -> FileMeta:
@@ -17,7 +17,7 @@ class StorageMock(IStorage):
         if upload_path[:-1] != "/":
             upload_path += "/"
 
-        file_url = self.storage_config.endpoint_url + upload_path + random_str
+        file_url = self.aws_config.endpoint_url + upload_path + random_str
 
         return FileMeta(
             url=file_url,

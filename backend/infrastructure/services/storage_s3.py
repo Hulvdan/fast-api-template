@@ -3,7 +3,7 @@ from typing import TypedDict
 
 from aioboto3.session import Session  # type: ignore[import]
 
-from common.config import AWSSettings
+from common.config import Config
 from common.services.random_re import IRandomRe
 from common.services.storage import FileMeta, IAsyncFile, IStorage
 
@@ -29,15 +29,15 @@ class ResponseHeadObject(TypedDict):
 class StorageS3(IStorage):
     """Хранилище файлов, подобное Amazon S3."""
 
-    def __init__(self, storage_config: AWSSettings, random_re: IRandomRe) -> None:
-        self.storage_config = storage_config
+    def __init__(self, config: Config, random_re: IRandomRe) -> None:
+        self.aws_config = config.aws
         self.random_re = random_re
 
         self.service_name = "s3"
-        self.endpoint_url = self.storage_config.endpoint_url
-        self.bucket = self.storage_config.storage_bucket_name
-        self.aws_access_key_id = self.storage_config.access_key_id
-        self.aws_secret_access_key = self.storage_config.secret_access_key
+        self.endpoint_url = self.aws_config.endpoint_url
+        self.bucket = self.aws_config.storage_bucket_name
+        self.aws_access_key_id = self.aws_config.access_key_id
+        self.aws_secret_access_key = self.aws_config.secret_access_key
 
         self.session_options = {
             "aws_access_key_id": self.aws_access_key_id,
@@ -68,7 +68,7 @@ class StorageS3(IStorage):
         async with self.session.client(**self.client_options) as s3:
             await s3.upload_fileobj(file, self.bucket, file_key)
             meta: ResponseHeadObject = await s3.head_object(Bucket=self.bucket, Key=file_key)
-        file_url = self.storage_config.endpoint_url + upload_path + random_str
+        file_url = self.aws_config.endpoint_url + upload_path + random_str
 
         return FileMeta(
             url=file_url,

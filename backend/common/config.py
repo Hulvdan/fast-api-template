@@ -57,7 +57,7 @@ class DatabaseConfig(BaseSettings):
         env_file_encoding = "utf-8"
 
 
-class AWSSettings(BaseSettings):
+class AWSConfig(BaseSettings):
     access_key_id: str = Field(env="AWS_ACCESS_KEY_ID")
     secret_access_key: str = Field(env="AWS_SECRET_ACCESS_KEY")
     storage_bucket_name: str = Field(env="AWS_STORAGE_BUCKET_NAME")
@@ -66,3 +66,21 @@ class AWSSettings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+
+
+class Config:
+    """Сборник всех существующих конфигураций.
+
+    Выведено в отдельный класс, т.к. по моим соображениям это имеет смысл для репозиториев, которые
+    могут быть реализованы по-разному: ходить в базу данных, файловую систему или же ходить по сети
+    в другие сервисы.
+    """
+
+    def __init__(self) -> None:
+        self.app = AppConfig()
+        self.auth = AuthConfig()
+        self.aws = AWSConfig()
+        self.database = DatabaseConfig()
+
+
+__all__ = ["Config"]

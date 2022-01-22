@@ -10,7 +10,7 @@ from infrastructure.services.random_re_rstr import RandomReXeger
 from infrastructure.services.storage_s3 import StorageS3
 from libs import punq
 
-from .config import AppConfig, AuthConfig, AWSSettings, DatabaseConfig
+from .config import Config
 from .resources import DatabaseResource
 
 
@@ -23,11 +23,8 @@ def _initialize_container() -> punq.Container:
     """Инициализация DI контейнера."""
     container = punq.Container(reassignments_prohibited=True)
 
-    # Configs
-    container.register(AppConfig, instance=AppConfig())
-    container.register(AuthConfig, instance=AuthConfig())
-    container.register(DatabaseConfig, instance=DatabaseConfig())
-    container.register(AWSSettings, instance=AWSSettings())
+    # Config
+    container.register(Config, instance=Config())
 
     # Resources
     container.register(DatabaseResource, factory=DatabaseResource)
@@ -45,7 +42,7 @@ def _load_use_cases(container: punq.Container) -> None:
     """Загрузка всех сценариев из приложений."""
     loaded_use_cases: set[str] = set()
 
-    apps = container.resolve(AppConfig).apps
+    apps = container.resolve(Config).app.apps
     for app in apps:
         try:
             use_cases_module = importlib.import_module(f"domain.{app}.use_cases")

@@ -3,13 +3,14 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
-from common.config import AppConfig
+from common.config import Config
 from common.container import get_container
 
 
-def add_cors_middleware(app: FastAPI, app_config: AppConfig) -> None:
-    origins = []
+def add_cors_middleware(app: FastAPI, config: Config) -> None:
+    app_config = config.app
 
+    origins = []
     if app_config.cors_origins:
         origins_raw = app_config.cors_origins.split(",")
         for origin in origins_raw:
@@ -30,9 +31,10 @@ async def create_app() -> FastAPI:
     container = get_container()
     container.finalize()  # Закрываем DI контейнер для изменений
 
-    app = FastAPI(title=container.resolve(AppConfig).project_name)
+    config = container.resolve(Config)
+    app = FastAPI(title=config.app.project_name)
     app.include_router(urls.router)
-    add_cors_middleware(app, container.resolve(AppConfig))
+    add_cors_middleware(app, config)
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(_: Request, exc: Exception) -> PlainTextResponse:

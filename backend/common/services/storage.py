@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import NamedTuple, Protocol, Union
 
-from common.config import AWSSettings
+from common.config import Config
 from common.services.random_re import IRandomRe
 
 
@@ -30,7 +30,7 @@ class IAsyncFile(Protocol):
 
 class IStorage(ABC):
     @abstractmethod
-    def __init__(self, storage_config: AWSSettings, random_re: IRandomRe) -> None:
+    def __init__(self, config: Config, random_re: IRandomRe) -> None:
         raise NotImplementedError
 
     @abstractmethod

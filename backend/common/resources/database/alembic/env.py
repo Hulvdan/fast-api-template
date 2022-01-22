@@ -9,12 +9,16 @@ from sqlalchemy import engine_from_config, pool
 BASE_DIR = Path(__file__).parent.parent.absolute()
 sys.path.append(str(BASE_DIR))
 
-from common.config import AppConfig, DatabaseConfig
+from common.config import Config
+
+project_config = Config()
+app_config = project_config.app
+database_config = project_config.database
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-dsn = DatabaseConfig().database_url.replace("+asyncpg", "")
+dsn = database_config.database_url.replace("+asyncpg", "")
 print(dsn)
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -28,7 +32,7 @@ config.set_main_option("sqlalchemy.url", dsn)
 # target_metadata = mymodel.Base.metadata
 
 target_metadata = []
-for app in AppConfig().apps:
+for app in app_config.apps:
     try:
         i = importlib.import_module("apps.{}.models".format(app))
     except ModuleNotFoundError:

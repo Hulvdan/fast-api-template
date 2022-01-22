@@ -50,7 +50,7 @@ from typing import Any
 from common.base import BaseUseCase
 from libs import punq
 
-from .config import AppConfig
+from .config import Config
 
 ...
 
@@ -59,7 +59,7 @@ def _load_use_cases(container: punq.Container) -> None:
     loaded_use_cases: set[str] = set()
 
     # Пробегаемся по всем приложениям
-    apps = container.resolve(AppConfig).apps
+    apps = container.resolve(Config).app.apps
     for app in apps:
         try:
             # Пытаемся импортировать модуль сценариев из приложения
