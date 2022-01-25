@@ -12,13 +12,16 @@ class FileMeta(NamedTuple):
 
     url: str
     key: str
+    filename: str
     last_modified: datetime
     content_length: int
     upload_path: str
 
 
 class IAsyncFile(Protocol):
-    """Протокол асинхронных бинарных потоков."""
+    """Протокол асинхронных бинарных потоков для файлов."""
+
+    filename: str
 
     async def write(self, data: Union[bytes, str]) -> None:
         """Запись в поток."""

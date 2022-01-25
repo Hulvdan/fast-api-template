@@ -76,6 +76,7 @@ class StorageS3(IStorage):
         return FileMeta(
             url=file_url,
             key=random_str,
+            filename=file.filename,
             last_modified=meta["LastModified"],
             content_length=meta["ContentLength"],
             upload_path=upload_path,

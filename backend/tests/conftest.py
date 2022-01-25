@@ -85,6 +85,7 @@ class AsyncImage:
     def __init__(self, file: io.BytesIO) -> None:
         """Оборачивание обычного бинарного потока в виде файла."""
         self._file = file
+        self.filename: str = file.name
 
     async def write(self, data: Union[bytes, str]) -> None:
         """Запись в бинарный поток."""
