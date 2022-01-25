@@ -1,7 +1,10 @@
+"""Базовый класс декларативного описания ORM моделей SQLAlchemy."""
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 
 
 class CustomBase:
+    """Базовый класс декларативного описания ORM моделей SQLAlchemy."""
+
     @declared_attr
     def __tablename__(cls) -> str:  # noqa
         return cls.__name__.lower()  # type: ignore

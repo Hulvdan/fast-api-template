@@ -1,3 +1,4 @@
+"""Создание и конфигурация FastAPI приложения."""
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
@@ -8,6 +9,7 @@ from common.container import get_container
 
 
 def add_cors_middleware(app: FastAPI, config: Config) -> None:
+    """Добавление разрешённых хостов в заголовок CORS_ORIGINS."""
     app_config = config.app
 
     origins = []
@@ -26,6 +28,7 @@ def add_cors_middleware(app: FastAPI, config: Config) -> None:
 
 
 async def create_app() -> FastAPI:
+    """Создание и конфигурация FastAPI приложения."""
     from . import urls
 
     container = get_container()

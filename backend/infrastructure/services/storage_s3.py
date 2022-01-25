@@ -1,3 +1,4 @@
+"""Реализация сервиса взаимодействия с хранилищем файлов, подобному S3 Bucket."""
 from datetime import datetime
 from typing import TypedDict
 
@@ -8,7 +9,7 @@ from common.services.random_re import IRandomRe
 from common.services.storage import FileMeta, IAsyncFile, IStorage
 
 
-class ResponseMetadata(TypedDict):
+class _ResponseMetadata(TypedDict):
     RequestId: str
     HostId: str
     HTTPStatusCode: int
@@ -16,8 +17,8 @@ class ResponseMetadata(TypedDict):
     RetryAttempts: int
 
 
-class ResponseHeadObject(TypedDict):
-    ResponseMetadata: ResponseMetadata
+class _ResponseHeadObject(TypedDict):
+    ResponseMetadata: _ResponseMetadata
     AcceptRanges: str
     LastModified: datetime
     ContentLength: int
@@ -27,9 +28,10 @@ class ResponseHeadObject(TypedDict):
 
 
 class StorageS3(IStorage):
-    """Хранилище файлов, подобное Amazon S3."""
+    """Сервис взаимодействия с хранилищем файлов, подобному S3 Bucket."""
 
     def __init__(self, config: Config, random_re: IRandomRe) -> None:
+        """Создание экземпляра с сохранением конфигурации."""
         self.aws_config = config.aws
         self.random_re = random_re
 
@@ -59,6 +61,7 @@ class StorageS3(IStorage):
         self.session: Session = Session(**self.session_options)
 
     async def upload_file(self, file: IAsyncFile, upload_path: str) -> FileMeta:
+        """Загрузка файла в S3 Bucket."""
         random_str = self.random_re.execute("[a-zA-Z0-9]{60}")
         if upload_path[:-1] != "/":
             upload_path += "/"
@@ -67,7 +70,7 @@ class StorageS3(IStorage):
         await file.seek(0)
         async with self.session.client(**self.client_options) as s3:
             await s3.upload_fileobj(file, self.bucket, file_key)
-            meta: ResponseHeadObject = await s3.head_object(Bucket=self.bucket, Key=file_key)
+            meta: _ResponseHeadObject = await s3.head_object(Bucket=self.bucket, Key=file_key)
         file_url = self.aws_config.endpoint_url + upload_path + random_str
 
         return FileMeta(
@@ -79,6 +82,7 @@ class StorageS3(IStorage):
         )
 
     async def delete_file(self, file_meta: FileMeta) -> None:
+        """Удаление файла из S3 Bucket."""
         file_key = file_meta.upload_path + file_meta.key
         async with self.session.client(**self.client_options) as s3:
             await s3.delete_object(Bucket=self.bucket, Key=file_key)

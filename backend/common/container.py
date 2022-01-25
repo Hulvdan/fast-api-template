@@ -1,3 +1,4 @@
+"""Dependency-injection контейнер."""
 import importlib
 import inspect
 from functools import lru_cache
@@ -16,6 +17,7 @@ from .resources import DatabaseResource
 
 @lru_cache(1)
 def get_container() -> punq.Container:
+    """Singleton фабрика DI контейнера."""
     return _initialize_container()
 
 

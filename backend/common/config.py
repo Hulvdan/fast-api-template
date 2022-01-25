@@ -1,3 +1,5 @@
+"""Конфигурация приложения на основе констант и переменных окружения."""
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from pydantic import BaseSettings, Field
@@ -68,6 +70,7 @@ class AWSConfig(BaseSettings):
     endpoint_url: str = Field(env="AWS_S3_ENDPOINT_URL")
 
 
+@dataclass
 class Config:
     """Сборник всех существующих конфигураций.
 
@@ -76,11 +79,10 @@ class Config:
     в другие сервисы.
     """
 
-    def __init__(self) -> None:
-        self.app = AppConfig()
-        self.auth = AuthConfig()
-        self.aws = AWSConfig()
-        self.database = DatabaseConfig()
+    app: AppConfig = field(default_factory=AppConfig)
+    auth: AuthConfig = field(default_factory=AuthConfig)
+    aws: AWSConfig = field(default_factory=AWSConfig)
+    database: DatabaseConfig = field(default_factory=DatabaseConfig)
 
 
 __all__ = ["Config"]

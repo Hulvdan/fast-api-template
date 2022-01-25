@@ -7,7 +7,6 @@ import httpx
 import pytest
 from PIL import Image  # type: ignore[import]
 
-from common.config import AuthConfig
 from common.resources.database import DatabaseResource
 from common.services.storage import IAsyncFile, IStorage
 from infrastructure.services.storage_mock import StorageMock
@@ -15,6 +14,7 @@ from libs.punq import Container
 
 
 def pytest_sessionstart() -> None:
+    """Подмена названия БД при запуске тестов."""
     os.environ["POSTGRES_DB"] = "postgres_test"
 
 
@@ -49,17 +49,14 @@ def _db(container: Container) -> Generator[None, None, None]:
 
 
 @pytest.fixture(scope="session")
-def auth_config(container: Container) -> AuthConfig:
-    return container.resolve(AuthConfig)
-
-
-@pytest.fixture(scope="session")
 def event_loop() -> asyncio.AbstractEventLoop:
+    """Фикстура event-loop-а. Нужна для работы python-asyncio."""
     return asyncio.get_event_loop()
 
 
 @pytest.fixture()
 async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
+    """Фикстура HTTP клиента."""
     from application.web.application import create_app
 
     app = await create_app()
@@ -69,7 +66,9 @@ async def client() -> AsyncGenerator[httpx.AsyncClient, None]:
 
 @pytest.fixture()
 def image_factory() -> Callable[[str], io.BytesIO]:
-    def get_image(image_name: str) -> io.BytesIO:
+    """Фикстура фабрики синхронных бинарных потоков."""
+
+    def _get_image(image_name: str) -> io.BytesIO:
         file = io.BytesIO()
         image = Image.new("RGBA", size=(100, 100), color=(155, 0, 0))
         image.save(file, "png")
@@ -77,29 +76,38 @@ def image_factory() -> Callable[[str], io.BytesIO]:
         file.seek(0)
         return file
 
-    return get_image
+    return _get_image
 
 
 class AsyncImage:
+    """Эмуляция асинхронного бинарного потока."""
+
     def __init__(self, file: io.BytesIO) -> None:
+        """Оборачивание обычного бинарного потока в виде файла."""
         self._file = file
 
     async def write(self, data: Union[bytes, str]) -> None:
+        """Запись в бинарный поток."""
         self._file.write(data)  # type: ignore
 
     async def read(self, size: int = -1) -> Union[bytes, str]:
+        """Чтение из бинарного потока."""
         return self._file.read(size)
 
     async def seek(self, offset: int) -> None:
+        """Перемещение по бинарному потоку."""
         self._file.seek(offset)
 
     async def close(self) -> None:
+        """Закрытие бинарного потока."""
         self._file.close()
 
 
 @pytest.fixture()
 def async_file_factory() -> Callable[[str], IAsyncFile]:
-    def get_async_file(file_name: str) -> IAsyncFile:
+    """Фикстура фабрики асинхронных бинарных потоков."""
+
+    def _get_async_file(file_name: str) -> IAsyncFile:
         file = io.BytesIO()
         image = Image.new("RGBA", size=(100, 100), color=(155, 0, 0))
         image.save(file, "png")
@@ -107,4 +115,4 @@ def async_file_factory() -> Callable[[str], IAsyncFile]:
         file.seek(0)
         return AsyncImage(file)
 
-    return get_async_file
+    return _get_async_file

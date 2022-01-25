@@ -10,6 +10,7 @@ from httpx import AsyncClient
 async def test_upload_file_view(
     client: AsyncClient, image_factory: Callable[..., io.BytesIO]
 ) -> None:
+    """Проверка endpoint-а загрузки файлов."""
     image = image_factory("test.png")
     files = {"image": image}
     response = await client.post("/api/v1/", files=files)

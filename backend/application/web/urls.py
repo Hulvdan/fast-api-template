@@ -1,3 +1,4 @@
+"""Подключение необходимых FastAPI маршрутизаторов в один корневой."""
 from fastapi.routing import APIRouter
 
 from .health_check.api import router as router_health_check

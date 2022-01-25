@@ -1,3 +1,4 @@
+"""Реализация сервиса взаимодействия с хранилищем файлов для тестов."""
 from datetime import datetime
 
 from common.config import Config
@@ -9,10 +10,12 @@ class StorageMock(IStorage):
     """Мок хранилища файлов для тестов."""
 
     def __init__(self, config: Config, random_re: IRandomRe) -> None:
+        """Создание экземпляра с сохранением конфигурации."""
         self.aws_config = config.aws
         self.random_re = random_re
 
     async def upload_file(self, file: IAsyncFile, upload_path: str) -> FileMeta:
+        """Эмуляция загрузки файла в хранилище."""
         random_str = self.random_re.execute("[a-zA-Z0-9]{60}")
         if upload_path[:-1] != "/":
             upload_path += "/"
@@ -28,4 +31,5 @@ class StorageMock(IStorage):
         )
 
     async def delete_file(self, file_meta: FileMeta) -> None:
+        """Эмуляция удаления файла в хранилище."""
         return None

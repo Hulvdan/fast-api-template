@@ -1,3 +1,4 @@
+"""Поднятие web сервера с использованием FastAPI и uvicorn."""
 import asyncio
 
 import uvicorn  # type: ignore[import]

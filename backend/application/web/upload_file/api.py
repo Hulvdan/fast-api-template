@@ -1,3 +1,4 @@
+"""API приложения загрузки файлов."""
 from http import HTTPStatus
 
 from fastapi import Depends, File, UploadFile
@@ -16,6 +17,7 @@ router = APIRouter()
 async def upload_file(
     image: UploadFile = File(...), container: Container = Depends(get_container)  # noqa: B008
 ) -> models.UploadFileResponse:
+    """Endpoint загрузки файла."""
     file_meta = await container.resolve(use_cases.UploadFileUseCase).execute(image)
     return models.UploadFileResponse.parse_obj(
         {
