@@ -9,11 +9,10 @@ from sqlalchemy import engine_from_config, pool
 BASE_DIR = Path(__file__).parent.parent.absolute()
 sys.path.append(str(BASE_DIR))
 
-from common.config import Config
+from common.config import AppConfig, DatabaseConfig
 
-project_config = Config()
-app_config = project_config.app
-database_config = project_config.database
+app_config = AppConfig()
+database_config = DatabaseConfig()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -32,9 +31,9 @@ config.set_main_option("sqlalchemy.url", dsn)
 # target_metadata = mymodel.Base.metadata
 
 target_metadata = []
-for app in app_config.apps:
+for app in database_config.apps:
     try:
-        i = importlib.import_module("apps.{}.models".format(app))
+        i = importlib.import_module("infrastructure.{}.models".format(app))
     except ModuleNotFoundError:
         continue
 

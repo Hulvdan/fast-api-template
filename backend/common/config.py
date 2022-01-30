@@ -17,10 +17,6 @@ class AppConfig(BaseSettings):
     cors_origins: str = Field(env="BACKEND_CORS_ORIGINS", default="")
     sentry_dsn = Field(env="SENTRY_DSN", default="")
     base_dir = BASE_DIR
-    apps: list[str] = [
-        "health_check",
-        "upload_file",
-    ]
 
 
 class DatabaseConfig(BaseSettings):
@@ -36,6 +32,10 @@ class DatabaseConfig(BaseSettings):
     password: str = Field(env="POSTGRES_PASSWORD")
     host: str = Field(env="BACKEND_DATABASE_HOST")
     port: int = Field(env="BACKEND_DATABASE_PORT", cast=int)
+
+    # Список приложений, которые используют SQLAlchemy для декларации моделей
+    # Нужно для Alembic миграций
+    apps: list[str] = []
 
     @property
     def database_url(self) -> str:
