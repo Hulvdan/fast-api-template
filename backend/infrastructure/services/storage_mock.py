@@ -1,7 +1,7 @@
 """Реализация сервиса взаимодействия с хранилищем файлов для тестов."""
 from datetime import datetime
 
-from common.config import Config
+from common.config import AWSConfig
 from common.services.random_re import IRandomRe
 from common.services.storage import FileMeta, IAsyncFile, IStorage
 
@@ -9,9 +9,9 @@ from common.services.storage import FileMeta, IAsyncFile, IStorage
 class StorageMock(IStorage):
     """Мок хранилища файлов для тестов."""
 
-    def __init__(self, config: Config, random_re: IRandomRe) -> None:
+    def __init__(self, aws_config: AWSConfig, random_re: IRandomRe) -> None:
         """Создание экземпляра с сохранением конфигурации."""
-        self.aws_config = config.aws
+        self.aws_config = aws_config
         self.random_re = random_re
 
     async def upload_file(self, file: IAsyncFile, upload_path: str) -> FileMeta:

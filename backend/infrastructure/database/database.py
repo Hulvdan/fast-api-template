@@ -6,16 +6,15 @@ from sqlalchemy import create_engine, orm
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy_utils import create_database, database_exists, drop_database  # type: ignore[import]
 
-from common.config import Config
+from common.config import DatabaseConfig
 from common.db import Base
 
 
 class DatabaseResource:
     """Подключение к базе данных с использованием SQLAlchemy."""
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, database_config: DatabaseConfig) -> None:
         """Создание экземпляра с сохранением конфигурации."""
-        database_config = config.database
         self._database_name = database_config.database
         self._database_url = database_config.database_url
         self._engine = create_async_engine(self._database_url)

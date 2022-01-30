@@ -1,5 +1,4 @@
 """Конфигурация приложения на основе констант и переменных окружения."""
-from dataclasses import dataclass, field
 from pathlib import Path
 
 from pydantic import BaseSettings, Field
@@ -8,7 +7,9 @@ BASE_DIR = Path(__file__).parent.parent.parent
 
 
 class AppConfig(BaseSettings):
-    class Config:
+    """Конфигурация приложения."""
+
+    class Config:  # noqa: D106
         env_file = ".env"
         env_file_encoding = "utf-8"
 
@@ -22,21 +23,10 @@ class AppConfig(BaseSettings):
     ]
 
 
-class AuthConfig(BaseSettings):
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-
-    jwt_expiration_delta = Field(env="ACCESS_TOKEN_EXPIRE_MINUTES", default=600)
-    jwt_refresh_expiration_delta = Field(env="JWT_REFRESH_EXPIRATION_DELTA", default=10)
-    jwt_auth_header_prefix = Field(env="JWT_AUTH_HEADER_PREFIX", default="JWT")
-    jwt_secret_key: str = Field(env="JWT_SECRET_KEY", default="dumb_secret_key")
-    oauth_scopes = {"read": "Read", "write": "Write"}
-    secret_key = Field(env="BACKEND_SECRET_KEY", default="dumb_secret_key")
-
-
 class DatabaseConfig(BaseSettings):
-    class Config:
+    """Конфигурация БД."""
+
+    class Config:  # noqa: D106
         env_file = ".env"
         env_file_encoding = "utf-8"
 
@@ -49,6 +39,7 @@ class DatabaseConfig(BaseSettings):
 
     @property
     def database_url(self) -> str:
+        """URL подключения к БД."""
         return "{protocol}://{username}:{password}@{host}:{port}/{database}".format(
             protocol=self.protocol,
             username=self.username,
@@ -60,7 +51,9 @@ class DatabaseConfig(BaseSettings):
 
 
 class AWSConfig(BaseSettings):
-    class Config:
+    """Конфигурация S3."""
+
+    class Config:  # noqa: D106
         env_file = ".env"
         env_file_encoding = "utf-8"
 
@@ -70,19 +63,8 @@ class AWSConfig(BaseSettings):
     endpoint_url: str = Field(env="AWS_S3_ENDPOINT_URL")
 
 
-@dataclass
-class Config:
-    """Сборник всех существующих конфигураций.
-
-    Выведено в отдельный класс, т.к. по моим соображениям это имеет смысл для репозиториев, которые
-    могут быть реализованы по-разному: ходить в базу данных, файловую систему или же ходить по сети
-    в другие сервисы.
-    """
-
-    app: AppConfig = field(default_factory=AppConfig)
-    auth: AuthConfig = field(default_factory=AuthConfig)
-    aws: AWSConfig = field(default_factory=AWSConfig)
-    database: DatabaseConfig = field(default_factory=DatabaseConfig)
-
-
-__all__ = ["Config"]
+__all__ = [
+    "AWSConfig",
+    "AppConfig",
+    "DatabaseConfig",
+]

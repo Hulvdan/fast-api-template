@@ -5,13 +5,11 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
 from application.common.container import get_container
-from common.config import Config
+from common.config import AppConfig
 
 
-def add_cors_middleware(app: FastAPI, config: Config) -> None:
+def add_cors_middleware(app: FastAPI, app_config: AppConfig) -> None:
     """Добавление разрешённых хостов в заголовок CORS_ORIGINS."""
-    app_config = config.app
-
     origins = []
     if app_config.cors_origins:
         origins_raw = app_config.cors_origins.split(",")
@@ -34,10 +32,10 @@ async def create_app() -> FastAPI:
     container = get_container()
     container.finalize()  # Закрываем DI контейнер для изменений
 
-    config = container.resolve(Config)
-    app = FastAPI(title=config.app.project_name)
+    app_config = container.resolve(AppConfig)
+    app = FastAPI(title=app_config.project_name)
     app.include_router(urls.router)
-    add_cors_middleware(app, config)
+    add_cors_middleware(app, app_config)
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(_: Request, exc: Exception) -> PlainTextResponse:

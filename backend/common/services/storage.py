@@ -1,10 +1,7 @@
 """Интерфейс сервиса, взаимодействующим с хранилищем файлов."""
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from datetime import datetime
 from typing import NamedTuple, Protocol, Union
-
-from common.config import Config
-from common.services.random_re import IRandomRe
 
 
 class FileMeta(NamedTuple):
@@ -36,13 +33,8 @@ class IAsyncFile(Protocol):
         """Закрытие потока."""
 
 
-class IStorage(ABC):
+class IStorage(Protocol):
     """Интерфейс сервиса, взаимодействующим с хранилищем файлов."""
-
-    @abstractmethod
-    def __init__(self, config: Config, random_re: IRandomRe) -> None:
-        """Создание экземпляра с сохранением конфигурации."""
-        raise NotImplementedError
 
     @abstractmethod
     async def upload_file(self, file: IAsyncFile, upload_path: str) -> FileMeta:

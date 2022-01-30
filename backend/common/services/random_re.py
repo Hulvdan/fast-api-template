@@ -1,8 +1,9 @@
 """Интерфейс сервиса генерации случайных строк по паттерну регулярного выражения."""
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from typing import Protocol
 
 
-class IRandomRe(ABC):
+class IRandomRe(Protocol):
     """Интерфейс сервиса генерации случайных строк по паттерну регулярного выражения."""
 
     @abstractmethod
