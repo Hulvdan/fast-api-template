@@ -5,7 +5,7 @@
 Данный проект следует принципам чистой архитектуры. Бизнес-логика не зависит
 от веб-фреймворков, баз данных и любых других технологий напрямую.
 
-![Tux, the Linux mascot](./docs/assets/Архитектура.svg)
+![Люблю рисовать схемки](./docs/assets/Архитектура.svg)
 
 Рассматривая множество структур файлов в проекте, я остановился на упрощённом
 до чистой архитектуры варианте, который предложил Robert Smallshire в своём
@@ -30,7 +30,8 @@
 которая позволяет очень просто внедрять зависимости.
 
 Вы можете взглянуть на создание DI контейнера
-[common/container.py](./common/container.py) и его использование в файле
+[application/common/container.py](./application/common/container.py)
+и его использование в файле
 [application/web/upload_file/api.py](./application/web/upload_file/api.py).
 
 ## Интересные решения, которые я хотел бы отметить
@@ -39,8 +40,10 @@
 
 Решил вернуть творчество в свою работу, снова использовав библиотеку importlib.
 
-Всё в том же файле [common/container.py](./common/container.py) есть функция
-`_load_use_cases`, которая вызывается на этапе инициализации DI контейнера.
+Всё в том же файле
+[application/common/container.py](./application/common/container.py)
+есть функция`_load_use_cases`, которая вызывается на этапе
+инициализации DI контейнера.
 
 ```python
 import importlib
@@ -48,9 +51,8 @@ import inspect
 from typing import Any
 
 from common.base import BaseUseCase
+from common.config import AppConfig
 from libs import punq
-
-from .config import Config
 
 ...
 
@@ -59,7 +61,7 @@ def _load_use_cases(container: punq.Container) -> None:
     loaded_use_cases: set[str] = set()
 
     # Пробегаемся по всем приложениям
-    apps = container.resolve(Config).app.apps
+    apps = container.resolve(AppConfig).apps
     for app in apps:
         try:
             # Пытаемся импортировать модуль сценариев из приложения
