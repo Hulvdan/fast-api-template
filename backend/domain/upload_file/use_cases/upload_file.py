@@ -1,9 +1,9 @@
 """Сценарий загрузки файла в хранилище файлов."""
-from common.base import BaseUseCase
+from common.base import UseCaseMeta
 from common.services.storage import FileMeta, IAsyncFile, IStorage
 
 
-class UploadFileUseCase(BaseUseCase):
+class UploadFileUseCase(metaclass=UseCaseMeta):
     """Сценарий загрузки файла в хранилище файлов."""
 
     def __init__(self, storage_service: IStorage) -> None:

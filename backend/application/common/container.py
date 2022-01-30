@@ -1,10 +1,7 @@
 """Dependency-injection контейнер."""
-import importlib
-import inspect
 from functools import lru_cache
-from typing import Any
 
-from common.base import BaseUseCase
+from common.base import UseCaseMeta
 from common.config import AppConfig, AWSConfig, DatabaseConfig
 from common.services.random_re import IRandomRe
 from common.services.storage import IStorage
@@ -36,35 +33,11 @@ def _initialize_container() -> punq.Container:
     container.register(IRandomRe, factory=RandomReXeger)  # type: ignore[misc]
     container.register(IStorage, factory=StorageS3)  # type: ignore[misc]
 
-    _load_use_cases(container)
+    # Use Cases
+    for use_case in UseCaseMeta.registered_use_cases:
+        container.register(use_case)
 
     return container
-
-
-def _load_use_cases(container: punq.Container) -> None:
-    """Загрузка всех сценариев из приложений."""
-    loaded_use_cases: set[str] = set()
-
-    apps = container.resolve(AppConfig).apps
-    for app in apps:
-        try:
-            use_cases_module = importlib.import_module(f"domain.{app}.use_cases")
-        except ModuleNotFoundError:
-            continue
-
-        module_members: list[tuple[str, Any]] = inspect.getmembers(use_cases_module)
-        for member_name, member in module_members:
-            member_mro = getattr(member, "mro", None)
-            if member_mro is None:
-                continue
-
-            mro = member_mro()
-            if len(mro) > 2 and BaseUseCase in mro:
-                if member_name in loaded_use_cases:
-                    continue
-
-                loaded_use_cases.add(member_name)
-                container.register(member)
 
 
 __all__ = [
