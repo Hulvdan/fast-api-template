@@ -7,8 +7,8 @@ import httpx
 import pytest
 from PIL import Image  # type: ignore[import]
 
-from common.resources.database import DatabaseResource
 from common.services.storage import IAsyncFile, IStorage
+from infrastructure.database import DatabaseResource
 from infrastructure.services.storage_mock import StorageMock
 from libs.punq import Container
 
