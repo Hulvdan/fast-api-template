@@ -4,8 +4,8 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import PlainTextResponse
 
+from application.common.container import get_container
 from common.config import Config
-from common.container import get_container
 
 
 def add_cors_middleware(app: FastAPI, config: Config) -> None:

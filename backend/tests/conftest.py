@@ -24,7 +24,7 @@ def container() -> Container:
 
     Например, смс-ки, email-ы, файлы и т.п.
     """
-    from common.container import get_container
+    from application.common.container import get_container
 
     container = get_container()
 

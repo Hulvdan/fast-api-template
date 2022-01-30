@@ -4,7 +4,7 @@ from http import HTTPStatus
 from fastapi import Depends, File, UploadFile
 from fastapi.routing import APIRouter
 
-from common.container import get_container
+from application.common.container import get_container
 from domain.upload_file import use_cases
 from libs.punq import Container
 

@@ -5,14 +5,13 @@ from functools import lru_cache
 from typing import Any
 
 from common.base import BaseUseCase
+from common.config import Config
 from common.services.random_re import IRandomRe
 from common.services.storage import IStorage
 from infrastructure.database import DatabaseResource
 from infrastructure.services.random_re_rstr import RandomReXeger
 from infrastructure.services.storage_s3 import StorageS3
 from libs import punq
-
-from .config import Config
 
 
 @lru_cache(1)
@@ -64,3 +63,8 @@ def _load_use_cases(container: punq.Container) -> None:
 
                 loaded_use_cases.add(member_name)
                 container.register(member)
+
+
+__all__ = [
+    "get_container",
+]
