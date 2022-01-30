@@ -7,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy_utils import create_database, database_exists, drop_database  # type: ignore[import]
 
 from common.config import DatabaseConfig
-from common.db import Base
+
+from .base import Base
 
 
 class DatabaseResource:

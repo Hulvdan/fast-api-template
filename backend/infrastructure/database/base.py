@@ -13,3 +13,8 @@ class CustomBase:
 
 
 Base = declarative_base(cls=CustomBase)
+
+
+__all__ = [
+    "Base",
+]
