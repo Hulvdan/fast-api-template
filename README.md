@@ -112,33 +112,25 @@ Flake8 - линтер. Линтеры помогают поддерживать 
 
 ## Участие в проекте
 
+### Установка pyenv
+
+Установите необходимые библиотеки [отсюда][PyenvSuggestedBuildEnvironment].
+
+Выполните следующую команду:
+
+```shell
+curl https://pyenv.run | bash
+```
+
+На всякий случай прикрепляю
+[частые проблемы с установкой pyenv][PyenvCommonBuildProblems].
+
 ### Первоначальная конфигурация после клонирования репозитория
 
-Необходимо глобально установить pre-commit
+Конфигурация окружения для разработки выполняется одной командой: `make`.
 
-```shell
-pip install pre-commit
-```
-
-В папке проекта выполните следующую команду,
-чтобы производились проверки перед каждым коммитом:
-
-```shell
-pre-commit install --install-hooks
-pre-commit install --hook-type commit-msg
-```
-
-Настройка poetry для создания виртуальных окружений
-внутри проектов в папках `.venv`.
-
-```shell
-poetry config virtualenvs.in-project true
-```
-
-```shell
-cd backend
-poetry install
-```
+Это установит необходимую версию **python** в **pyenv**, установит **poetry**,
+настроит **pre-commit**, а также установит **poetry** окружение в **backend/**.
 
 [PreCommitLink]: https://commonmark.org/help/tutorial/07-links.html "pre-commit"
 [BlackLink]: https://github.com/psf/black "Black"
@@ -148,3 +140,5 @@ poetry install
 [PoetryLink]: https://python-poetry.org/ "Poetry"
 [PunqLink]: https://github.com/bobthemighty/punq "punq"
 [DIConferenceLink]: https://www.youtube.com/watch?v=3Z_3yCgVKkM
+[PyenvSuggestedBuildEnvironment]: https://github.com/pyenv/pyenv/wiki#suggested-build-environment
+[PyenvCommonBuildProblems]: https://github.com/pyenv/pyenv/wiki/Common-build-problems

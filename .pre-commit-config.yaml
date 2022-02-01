@@ -12,6 +12,11 @@ repos:
       - id: check-merge-conflict
       - id: check-ast
 
+  - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
+    rev: 2.4.0
+    hooks:
+      - id: editorconfig-checker
+
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v1
     hooks:
