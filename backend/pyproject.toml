@@ -17,7 +17,7 @@ line_length = 100
 include_trailing_comma = true
 
 [tool.poetry.dependencies]
-python = "^3.10.1"
+python = "^3.10.2"
 
 # Server
 uvicorn = "^0.15.0"
