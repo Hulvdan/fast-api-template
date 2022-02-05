@@ -8,6 +8,7 @@ import pytest
 from PIL import Image  # type: ignore[import]
 
 from common.services.storage import IAsyncFile, IStorage
+from domain.upload_file.repos import IUploadedFileRepo
 from infrastructure.database import DatabaseResource
 from infrastructure.services.storage_mock import StorageMock
 from libs.punq import Container
@@ -44,8 +45,17 @@ def _db(container: Container) -> Generator[None, None, None]:
     db: DatabaseResource = container.resolve(DatabaseResource)
     db.drop_database()
     db.create_database()
+    db.create_tables()
     yield
     db.drop_database()
+
+
+@pytest.fixture(autouse=True)
+def _clear_db_tables(container: Container) -> Generator[None, None, None]:
+    """Очистка таблиц БД после каждого теста."""
+    yield
+    db_resource = container.resolve(DatabaseResource)
+    db_resource.clear_tables()
 
 
 @pytest.fixture(scope="session")
@@ -117,3 +127,9 @@ def async_file_factory() -> Callable[[str], IAsyncFile]:
         return AsyncImage(file)
 
     return _get_async_file
+
+
+@pytest.fixture()
+def upload_file_repo(container: Container) -> IUploadedFileRepo:
+    """Репозиторий загруженных файлов."""
+    return container.resolve(IUploadedFileRepo)  # type: ignore[misc]

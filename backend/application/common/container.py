@@ -5,9 +5,11 @@ from common.base import UseCaseMeta
 from common.config import AppConfig, AWSConfig, DatabaseConfig
 from common.services.random_re import IRandomRe
 from common.services.storage import IStorage
+from domain.upload_file.repos import IUploadedFileRepo
 from infrastructure.database import DatabaseResource
 from infrastructure.services.random_re_rstr import RandomReXeger
 from infrastructure.services.storage_s3 import StorageS3
+from infrastructure.upload_file.repos import UploadedFileDBRepo
 from libs import punq
 
 
@@ -32,6 +34,9 @@ def _initialize_container() -> punq.Container:
     # Services
     container.register(IRandomRe, factory=RandomReXeger)  # type: ignore[misc]
     container.register(IStorage, factory=StorageS3)  # type: ignore[misc]
+
+    # Repos
+    container.register(IUploadedFileRepo, factory=UploadedFileDBRepo)  # type: ignore[misc]
 
     # Use Cases
     for use_case in UseCaseMeta.registered_use_cases:

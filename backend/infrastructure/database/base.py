@@ -7,7 +7,7 @@ class CustomBase:
 
     @declared_attr
     def __tablename__(cls) -> str:  # noqa
-        return cls.__name__.lower()  # type: ignore
+        return cls.__name__.lower()
 
     __mapper_args__ = {"eager_defaults": True}
 

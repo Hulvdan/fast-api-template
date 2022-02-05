@@ -53,7 +53,7 @@ repos:
       # Mypy работает со всеми файлами
       - id: backend-mypy
         name: backend-mypy
-        entry: docker-compose exec -T backend mypy --config-file setup.cfg .
+        entry: docker-compose exec -T backend mypy --show-error-codes --config-file setup.cfg .
         language: system
         files: ^backend/.*.(py|pyi)$
         pass_filenames: false

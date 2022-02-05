@@ -24,7 +24,7 @@ uvicorn = "^0.15.0"
 uvloop = "^0.16.0"
 
 # DB
-SQLAlchemy = {version = ">=1.4,<2", extras = ["asyncio"]}
+SQLAlchemy = {version = ">=1.4,<2", extras = ["asyncio", "mypy"]}
 SQLAlchemy-Utils = "^0.37.9"
 alembic = "^1.7.4"
 asyncpg = "^0.24.0"
@@ -42,8 +42,8 @@ aioboto3 = "^9.2.2"
 rstr = "^3.0.0"
 
 # Typehinting
-mypy = "^0.910"
 mypy-extensions = "^0.4.3"
+mypy = "^0.931"
 
 [tool.poetry.dev-dependencies]
 # Linting
@@ -71,7 +71,6 @@ black = "^21.9b0"
 isort = "^5.9.3"
 
 # Stubs
-sqlalchemy2-stubs = "^0.0.2-alpha.19"
 python-dotenv = "^0.19.2"
 
 # Tests

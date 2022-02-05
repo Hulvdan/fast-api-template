@@ -18,13 +18,14 @@ async def upload_file(
     image: UploadFile = File(...), container: Container = Depends(get_container)  # noqa: B008
 ) -> models.UploadFileResponse:
     """Endpoint загрузки файла."""
-    file_meta = await container.resolve(use_cases.UploadFileUseCase).execute(image)
+    uploaded_file = await container.resolve(use_cases.UploadFileUseCase).execute(image)
     return models.UploadFileResponse.parse_obj(
         {
-            "url": file_meta.url,
-            "key": file_meta.key,
-            "last_modified": file_meta.last_modified,
-            "content_length": file_meta.content_length,
-            "upload_path": file_meta.upload_path,
+            "uuid": uploaded_file.uuid,
+            "url": uploaded_file.url,
+            "key": uploaded_file.key,
+            "last_modified": uploaded_file.last_modified,
+            "content_length": uploaded_file.content_length,
+            "upload_path": uploaded_file.upload_path,
         }
     )

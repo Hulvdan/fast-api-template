@@ -45,7 +45,7 @@ class DatabaseResource:
         Это куда быстрее, чем применять миграции. Минус в том, что мы так не тестируем миграции.
         """
         engine = create_engine(self._sync_db_url)
-        Base.metadata.create_all(engine)  # type: ignore
+        Base.metadata.create_all(engine)
         engine.dispose()
 
     async def clear_tables(self) -> None:

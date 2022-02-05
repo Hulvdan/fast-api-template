@@ -10,7 +10,7 @@ class UseCaseMeta(type):
 
     registered_use_cases: list[type] = []
 
-    def __new__(mcs, *args: list[Any], **kwargs: dict[str, Any]) -> type:  # type: ignore[misc]
+    def __new__(mcs, *args: list[Any], **kwargs: dict[str, Any]) -> type:
         """Сохраняем сценарий в список."""
         use_case_class = super().__new__(mcs, *args, **kwargs)
         UseCaseMeta.registered_use_cases.append(use_case_class)
