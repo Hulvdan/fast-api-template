@@ -28,29 +28,39 @@ repos:
     hooks:
       - id: markdownlint
 
+  # Тут свои прекоммиты, которые запускаются в отдельных docker-контейнерах.
+  # Для них нужно отрезать папку (название проекта) в начале каждого аргумента, что делает sed
+  #
+  # ATTENTION: Если вылетает ошибка 123 или 1, вероятнее всего, контейнер не запущен
   - repo: local
     hooks:
+      # ========================================= Backend ==========================================
       - id: backend-black
         name: backend-black
-        entry: backend/.venv/bin/black --config backend/pyproject.toml --check
+        entry: bash -c 'echo "$@" | sed "s/^backend\///g" | sed "s/\sbackend\// /g" |
+                xargs docker-compose exec -T backend black --check' --
+        verbose: true
         language: system
         files: ^backend/.*.(py|pyi)$
 
       - id: backend-isort
         name: backend-isort
-        entry: backend/.venv/bin/isort --sp backend/pyproject.toml --check-only
+        entry: bash -c 'echo "$@" | sed "s/^backend\///g" | sed "s/\sbackend\// /g" |
+                xargs docker-compose exec -T backend isort --sp pyproject.toml --check-only' --
         language: system
         files: ^backend/.*.(py|pyi)$
 
+      # Mypy работает со всеми файлами
       - id: backend-mypy
         name: backend-mypy
-        entry: backend/.venv/bin/mypy --config-file backend/setup.cfg backend
+        entry: docker-compose exec -T backend mypy --config-file setup.cfg .
         language: system
         files: ^backend/.*.(py|pyi)$
         pass_filenames: false
 
       - id: backend-flake8
         name: backend-flake8
-        entry: backend/.venv/bin/flake8 --config backend/setup.cfg
+        entry: bash -c 'echo "$@" | sed "s/^backend\///g" | sed "s/\sbackend\// /g" |
+                xargs docker-compose exec -T backend flake8 --config setup.cfg' --
         language: system
         files: ^backend/.*.(py|pyi)$

@@ -110,27 +110,13 @@ Flake8 - линтер. Линтеры помогают поддерживать 
 Вы можете преисполниться чистой архитектурой,
 перейдя в папку [backend](./backend)
 
-## Участие в проекте
-
-### Установка pyenv
-
-Установите необходимые библиотеки [отсюда][PyenvSuggestedBuildEnvironment].
-
-Выполните следующую команду:
-
-```shell
-curl https://pyenv.run | bash
-```
-
-На всякий случай прикрепляю
-[частые проблемы с установкой pyenv][PyenvCommonBuildProblems].
+## Разработка
 
 ### Первоначальная конфигурация после клонирования репозитория
 
 Конфигурация окружения для разработки выполняется одной командой: `make`.
 
-Это установит необходимую версию **python** в **pyenv**, установит **poetry**,
-настроит **pre-commit**, а также установит **poetry** окружение в **backend/**.
+Это установит и настроит **pre-commit**.
 
 [PreCommitLink]: https://commonmark.org/help/tutorial/07-links.html "pre-commit"
 [BlackLink]: https://github.com/psf/black "Black"
