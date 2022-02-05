@@ -18,7 +18,7 @@ repos:
       - id: editorconfig-checker
 
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v1
+    rev: v1.2.0
     hooks:
       - id: conventional-pre-commit
         stages: [ commit-msg ]
