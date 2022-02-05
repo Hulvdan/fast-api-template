@@ -217,25 +217,25 @@ class Registry:
         """Registers a concrete implementation of an abstract service.
 
         Examples:
-             In this example, the EmailSender type is an abstract class
-             and SmtpEmailSender is our concrete implementation.
+            In this example, the EmailSender type is an abstract class
+            and SmtpEmailSender is our concrete implementation.
 
-             >>> from punq import Container
-             >>> container = Container()
+            >>> from punq import Container
+            >>> container = Container()
 
-             >>> class EmailSender:
-             ...     def send(self, msg):
-             ...         pass
-             ...
-             >>> class SmtpEmailSender(EmailSender):
-             ...     def send(self, msg):
-             ...         print("Sending message via smtp: " + msg)
-             ...
-             >>> container.register(EmailSender, SmtpEmailSender)
-             <punq.Container object at 0x...>
-             >>> instance = container.resolve(EmailSender)
-             >>> instance.send("Hello")
-             Sending message via smtp: Hello
+            >>> class EmailSender:
+            ...     def send(self, msg):
+            ...         pass
+            ...
+            >>> class SmtpEmailSender(EmailSender):
+            ...     def send(self, msg):
+            ...         print("Sending message via smtp: " + msg)
+            ...
+            >>> container.register(EmailSender, SmtpEmailSender)
+            <punq.Container object at 0x...>
+            >>> instance = container.resolve(EmailSender)
+            >>> instance.send("Hello")
+            Sending message via smtp: Hello
         """
         if self._reassignments_prohibited and len(self.__registrations[service]) > 0:
             raise ReassignmentsProhibitedException
