@@ -6,7 +6,7 @@ from pathlib import Path
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-BASE_DIR = Path(__file__).parent.parent.absolute()
+BASE_DIR = Path(__file__).parent.parent.parent.absolute()
 sys.path.append(str(BASE_DIR))
 
 from common.config import AppConfig, DatabaseConfig
