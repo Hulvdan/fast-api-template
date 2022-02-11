@@ -349,19 +349,6 @@ flake8-polyfill = "*"
 pycodestyle = "*"
 
 [[package]]
-name = "flake8-black"
-version = "0.2.4"
-description = "flake8 plugin to call black as a code style validator"
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-black = "*"
-flake8 = ">=3.0.0"
-toml = "*"
-
-[[package]]
 name = "flake8-broken-line"
 version = "0.4.0"
 description = "Flake8 plugin to forbid backslashes for line breaks"
@@ -461,22 +448,6 @@ python-versions = ">=3.6,<4.0"
 attrs = "*"
 eradicate = ">=2.0,<3.0"
 flake8 = ">=3.5,<5"
-
-[[package]]
-name = "flake8-isort"
-version = "4.1.1"
-description = "flake8 plugin that integrates isort ."
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-flake8 = ">=3.2.1,<5"
-isort = ">=4.3.5,<6"
-testfixtures = ">=6.8.0,<7"
-
-[package.extras]
-test = ["pytest-cov"]
 
 [[package]]
 name = "flake8-pie"
@@ -1168,19 +1139,6 @@ python-versions = ">=3.6"
 pbr = ">=2.0.0,<2.1.0 || >2.1.0"
 
 [[package]]
-name = "testfixtures"
-version = "6.18.3"
-description = "A collection of helpers and mock objects for unit tests and doc tests."
-category = "dev"
-optional = false
-python-versions = "*"
-
-[package.extras]
-build = ["setuptools-git", "wheel", "twine"]
-docs = ["sphinx", "zope.component", "sybil", "twisted", "mock", "django (<2)", "django"]
-test = ["pytest (>=3.6)", "pytest-cov", "pytest-django", "zope.component", "sybil", "twisted", "mock", "django (<2)", "django"]
-
-[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -1269,7 +1227,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10.2"
-content-hash = "981f0e6720ca5d067464eef0e98bac68d4edbccef92597d77ad14bee96d72924"
+content-hash = "bf63bba902b2e83242e6eef047a4b15160056ab5e6b0198f40eb6381576d4d97"
 
 [metadata.files]
 aioboto3 = [
@@ -1454,10 +1412,6 @@ flake8-alphabetize = [
 flake8-bandit = [
     {file = "flake8_bandit-2.1.2.tar.gz", hash = "sha256:687fc8da2e4a239b206af2e54a90093572a60d0954f3054e23690739b0b0de3b"},
 ]
-flake8-black = [
-    {file = "flake8-black-0.2.4.tar.gz", hash = "sha256:a7871bfd1cbff431a1fc91ba60ae154510c80f575e6b9a2bbb13dfb4650afd22"},
-    {file = "flake8_black-0.2.4-py3-none-any.whl", hash = "sha256:0a70dfd97c8439827f365dc6dbc6c8c9cc087f0833625c6cc6848ff7876256be"},
-]
 flake8-broken-line = [
     {file = "flake8-broken-line-0.4.0.tar.gz", hash = "sha256:771aab5aa0997666796fed249d0e48e6c01cdfeca8c95521eea28a38b7ced4c7"},
     {file = "flake8_broken_line-0.4.0-py3-none-any.whl", hash = "sha256:e9c522856862239a2c7ef2c1de0276fa598572aa864bd4e9c7efc2a827538515"},
@@ -1488,10 +1442,6 @@ flake8-docstrings = [
 flake8-eradicate = [
     {file = "flake8-eradicate-1.2.0.tar.gz", hash = "sha256:acaa1b6839ff00d284b805c432fdfa6047262bd15a5504ec945797e87b4de1fa"},
     {file = "flake8_eradicate-1.2.0-py3-none-any.whl", hash = "sha256:51dc660d0c1c1ed93af0f813540bbbf72ab2d3466c14e3f3bac371c618b6042f"},
-]
-flake8-isort = [
-    {file = "flake8-isort-4.1.1.tar.gz", hash = "sha256:d814304ab70e6e58859bc5c3e221e2e6e71c958e7005239202fee19c24f82717"},
-    {file = "flake8_isort-4.1.1-py3-none-any.whl", hash = "sha256:c4e8b6dcb7be9b71a02e6e5d4196cefcef0f3447be51e82730fb336fff164949"},
 ]
 flake8-pie = [
     {file = "flake8-pie-0.15.0.tar.gz", hash = "sha256:a2d1e67a374d925f688300e9d0e202d1827a0d91e0a11114f712beee639bdc7c"},
@@ -2130,10 +2080,6 @@ stdlib-list = [
 stevedore = [
     {file = "stevedore-3.5.0-py3-none-any.whl", hash = "sha256:a547de73308fd7e90075bb4d301405bebf705292fa90a90fc3bcf9133f58616c"},
     {file = "stevedore-3.5.0.tar.gz", hash = "sha256:f40253887d8712eaa2bb0ea3830374416736dc8ec0e22f5a65092c1174c44335"},
-]
-testfixtures = [
-    {file = "testfixtures-6.18.3-py2.py3-none-any.whl", hash = "sha256:6ddb7f56a123e1a9339f130a200359092bd0a6455e31838d6c477e8729bb7763"},
-    {file = "testfixtures-6.18.3.tar.gz", hash = "sha256:2600100ae96ffd082334b378e355550fef8b4a529a6fa4c34f47130905c7426d"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},
