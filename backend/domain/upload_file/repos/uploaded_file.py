@@ -23,7 +23,7 @@ class IUploadedFileRepo(Protocol):
     """Интерфейс репозиторий загруженных файлов."""
 
     @abstractmethod
-    async def delete(self, uuid: UUID) -> UploadedFile:
+    async def delete(self, file: UploadedFile) -> None:
         """Удаление конкретного файла."""
 
     @abstractmethod

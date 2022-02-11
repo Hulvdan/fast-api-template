@@ -56,8 +56,15 @@ class UploadedFileDBRepo(IUploadedFileRepo):
         """Пробрасываем сессию."""
         self._session = db_resource.session
 
-    async def delete(self, uuid: UUID) -> UploadedFile:
+    async def delete(self, file: UploadedFile) -> None:
         """Удаление конкретного файла."""
+        session: AsyncSession
+        async with self._session() as session:
+            db_file = await session.get(UploadedFileDBModel, file.uuid)
+            if db_file is None:
+                raise
+            await session.delete(db_file)
+            await session.commit()
 
     async def create(self, file: UploadedFile) -> UploadedFile:
         """Создание файла."""
