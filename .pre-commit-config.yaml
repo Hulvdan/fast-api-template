@@ -35,6 +35,15 @@ repos:
   - repo: local
     hooks:
       # ========================================= Backend ==========================================
+      - id: backend-docker
+        name: backend-docker
+        entry: docker-compose up --build -d backend
+        verbose: true
+        language: system
+        files: ^backend/.*.(py|pyi)$
+        pass_filenames: false
+        fail_fast: true
+
       - id: backend-black
         name: backend-black
         entry: bash -c 'echo "$@" | sed "s/^backend\///g" | sed "s/\sbackend\// /g" |
