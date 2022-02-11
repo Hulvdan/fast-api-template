@@ -2,10 +2,13 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import PlainTextResponse
+from starlette.responses import JSONResponse, PlainTextResponse
 
 from application.common.container import get_container
+from common.base import DomainException
 from common.config import AppConfig
+
+from .base import HttpExceptionMeta
 
 
 def add_cors_middleware(app: FastAPI, app_config: AppConfig) -> None:
@@ -40,5 +43,16 @@ async def create_app() -> FastAPI:
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(_: Request, exc: Exception) -> PlainTextResponse:
         return PlainTextResponse(str(exc), status_code=400)
+
+    @app.exception_handler(DomainException)
+    async def domain_exception_handler(_: Request, exc: DomainException) -> JSONResponse:
+        http_exception = HttpExceptionMeta.registered_exceptions[exc.__class__]
+        return JSONResponse(
+            {
+                "message": http_exception.message,
+                "reason": http_exception.reason,
+            },
+            status_code=http_exception.status,
+        )
 
     return app
