@@ -1,40 +1,40 @@
 # fast-api-template
 
-## Мотивация
+[![Русский язык](https://raw.githubusercontent.com/stevenrskelton/flag-icon/master/png/16/country-4x3/bg.png) Русский язык](/README_ru.md)
 
-Я решил создать данный проект в просветительских целях для распространения
-применения хороших практик ведения проекта на Python и поддержании его
-архитектуры.
+## Rationale
 
-## "Best"-практики, использованные в данном проекте
+I decided to create this project for enlightening purposes to spread
+the application of good practices for running and maintaining a Python project.
+
+## Best-practices, used in this project
 
 ### [pre-commit][PreCommitLink]
 
-Данный фреймворк значительно облегчает работу с хуками в git.
+This framework makes it much easier to work with hooks in git.
 
-С его помощью можно настроить ряд проверок качества коммитов -
-начиная от форматирования, линтинга, валидности кода,
-заканчивая сообщениями этих коммитов.
+It can be used to set up a number of commit quality checks -
+ranging from formatting, linking, code validity,
+to the messages of those commits.
 
 ### [black][BlackLink]
 
-Это бескомпромиссный форматтер python-файлов, который по моему мнению лучше,
-чем другие альтернативы - autopep8 и yapf.
+This is an uncompromising python file formatter, which in my opinion is better,
+than the alternatives autopep8 and yapf.
 
-У меня не получилось на своём опыте подружить их вместе с isort, поэтому
-приходится мириться с нарушениями PEP8 по вине black и довольствоваться
-лишь однородным форматированием кода.
+I have not been able to get them to work together with isort,
+so I have to live with black's PEP8 violations.
 
 ### [isort][IsortLink]
 
-Инструмент для умного сортирования импортов в python-файлах.
+A tool for sorting imports in python files.
 
 ### [mypy][MypyLink]
 
-Статический анализатор кода из мира Python. Он позволяет использовать
-аннотации типов для преждевременной проверки работоспособности кода.
+A static code analyzer from the world of Python.
+It allows you to use type annotations for premature code validation.
 
-Если в репозитории будет невалидный python-код, например:
+If there is invalid python code, for example:
 
 ```python
 from typing import Any
@@ -42,7 +42,7 @@ def sum_str_and_int(string: str, number: int) -> Any:
     return string + number
 ```
 
-То mypy выдаст следующую ошибку:
+Then mypy will generate the following error:
 
 ```bash
 $ mypy .
@@ -50,73 +50,60 @@ a.py:3: error: Unsupported operand types for + ("str" and "int")
 Found 1 error in 1 file (checked 1 source file)
 ```
 
-Если принять во внимание, что mypy можно строжайше настроить, то можно быть
-уверенным в том, что в репозиторий не прольётся очевидно неработающий код,
-который разработчик мог допустить по невнимательности.
+If you take into account that mypy can be strictly customized,
+you can be sure that the repository won't leak obviously broken code,
+that the developer may have been careless.
 
-На моей практике использование mypy значительно уменьшает количество таких
-ошибок во время рефакторинга и переработок существующего функционала.
+In my practice, using mypy greatly reduces the number of such
+errors during refactoring and reworking of existing functionality.
 
 ### [flake8][Flake8Link]
 
-Flake8 - линтер. Линтеры помогают поддерживать код однородным и легким для
-восприятия. Функционал Flake8 расширяется путём добавления плагинов,
-которые вносят новые правила проверки кода.
+Flake8 is a linter. Linters help to keep the code consistent
+and easy to understand. Flake8 functionality is extended by adding plugins
+that introduce new code validation rules.
 
 ### [poetry][PoetryLink]
 
-На данный момент - это самый лучший менеджер Python пакетов.
+I'm a firm believer that at this moment **poetry**
+is the best manager of python packages.
 
-Если вы не используете poetry... используйте poetry...
+If you don't use poetry... use poetry...
 
-### Чистая архитектура
+### Clean Architecture
 
-Особенность распространённых архитектурных подходов на любом языке
-программирования заключается в том, что в центре ПО находится бизнес-логика,
-а вокруг неё "плагинами" прикручивается всё остальное - веб-фреймворки, базы
-данных, хранилища файлов, сервисы оповещений и т.п.
+There were a lot of discussions about Clean Architecture.
+I believe, this is a thing that every developer should know,
+but don't be too fanatical about it.
 
-Данные подходы были выработаны индустрией для существенного облегчения
-сопровождения проектов (в особенности - масштабирования), которые живут
-несколько лет или десятилетий. За это время может смениться множество
-технологий, могут появиться куда более привлекательные альтернативы,
-но бизнес-логика... бизнес-логика не должна зависеть от технологий как можно
-дольше, ведь хорошего архитектора от плохого отличает количество непринятых
-решений.
+### Dependency Injection
 
-Чистая архитектура не является исключением. В данном репозитории вы увидите
-множественные примеры инверсии зависимостей, ограничения использования
-бизнес-логикой внешних зависимостей посредством выстраивания слоёв абстракций
-вокруг.
+Dependency injection is an approach that allows an object
+to receive other objects on which it depends at the design stage.
 
-### Dependency Injection - Внедрение зависимостей
+For some reason this approach is not actively used in Python projects,
+although it is far from being a novelty in programming.
 
-Внедрение зависимостей - это подход, позволяющий объекту получать
-другие объекты, от которых он зависит, на этапе конструирования.
+The [punq][PunqLink] library was chosen and slightly modified as a DI solution.
 
-Данный подход почему-то не очень активно используется в Python проектах, хотя
-он - далеко не новшество в программировании.
+I made this decision after watching
+a [presentation by Alexander Shibaev, Tinkoff][DIConferenceLink].
+In it he reviewed the existing python libraries and frameworks,
+that allow the use of DI and explained why they settled on **punq**.
 
-В качестве DI решения была выбрана и
-слегка допилена библиотека [punq][PunqLink].
+## Further reading
 
-Данное решение мною было принято после просмотра
-[выступления][DIConferenceLink] Александра Шибаева, Тинькофф.
-В нём он рассмотрел существующие python-библиотеки и фреймворки,
-позволяющие использовать DI и объяснил, почему они остановились на punq.
+You can enjoy the clean architecture
+by navigating to the folder [backend](./backend)
 
-## Далее
+## Development
 
-Вы можете преисполниться чистой архитектурой,
-перейдя в папку [backend](./backend)
+### Initial configuration after cloning the repository
 
-## Разработка
+Configuration of the development environment
+is performed with a single command: `make`.
 
-### Первоначальная конфигурация после клонирования репозитория
-
-Конфигурация окружения для разработки выполняется одной командой: `make`.
-
-Это установит и настроит **pre-commit**.
+It will install and configure **pre-commit**.
 
 [PreCommitLink]: https://commonmark.org/help/tutorial/07-links.html "pre-commit"
 [BlackLink]: https://github.com/psf/black "Black"

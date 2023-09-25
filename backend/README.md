@@ -1,37 +1,41 @@
 # backend
 
-## Структура проекта
+[![Русский язык](https://raw.githubusercontent.com/stevenrskelton/flag-icon/master/png/16/country-4x3/bg.png) Русский язык](./README_ru.md)
 
-Данный проект следует принципам чистой архитектуры. Бизнес-логика не зависит
-от веб-фреймворков, баз данных и любых других технологий напрямую.
+## Project's structure
 
-![Люблю рисовать схемки](./docs/assets/Архитектура.svg)
+This project follows the principles of pure architecture.
+The business logic does not depend on web frameworks, databases
+or any other technologies directly.
 
-Рассматривая множество структур файлов в проекте, я остановился на упрощённом
-до чистой архитектуры варианте, который предложил Robert Smallshire в своём
-[докладе][ProjectStructureLink] о реализации DDD на конференции europython.
+![I love to draw schematics](./docs/assets/ArchitectureEN.svg)
 
-У нас есть 3 основных модуля, у которых
-строжайшим образом разделены зоны ответственности:
+Considering the many file structures in the project,
+I settled on a simplified option that Robert Smallshire suggested in
+[his talk on DDD implementation][ProjectStructureLink]
+at the europython conference.
 
-| Название модуля  | Зона ответственности     |
+We have 3 main modules that have strictly separated areas of responsibility:
+
+| Module's name    | Area of responsibility   |
 |------------------|--------------------------|
-| `domain`         | Бизнес-логика            |
-| `infrastructure` | Имплементации сервисов   |
-| `application`    | Точки входа в приложение |
+| `domain`         | Domain-logic             |
+| `infrastructure` | Services implementation  |
+| `application`    | Application endpoints    |
 
-## Борьба с внешними зависимостями в слое бизнес-логики
+## Fighting external dependencies in the business logic layer
 
-Сценарии бизнес-логики зависят от интерфейсов различных сервисов, что позволяет
-для различных точек входа указывать разные реализации этих сервисов.
+Business logic scenarios depend on the interfaces of different services,
+which allows different implementations of these services to be specified
+for different entry points.
 
-Так, на проде будет использоваться StorageS3 реализация интерфейса IStorage,
-тогда как при unit-тестировании - StorageMock. Спасибо DI библиотеке punq,
-которая позволяет очень просто внедрять зависимости.
+Thus, the prod will use the StorageS3 implementation of the IStorage interface,
+while unit testing will use StorageMock. Thanks to the DI library punq, which
+makes it very easy to inject dependencies.
 
-Вы можете взглянуть на создание DI контейнера
+You can take a look at DI container creationg at
 [application/common/container.py](./application/common/container.py)
-и его использование в файле
-[application/web/upload_file/api.py](./application/web/upload_file/api.py).
+and using it in
+[application/web/upload_file/api.py](./application/web/upload_file/api.py) file.
 
 [ProjectStructureLink]: https://youtu.be/Ru2T4fu3bGQ?t=2878
